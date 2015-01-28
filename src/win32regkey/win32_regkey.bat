@@ -1,0 +1,1 @@
+cl -LD Win32RegKey.c advapi32.lib -FeWin32RegKey.dll
