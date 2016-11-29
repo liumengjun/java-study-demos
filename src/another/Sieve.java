@@ -1,3 +1,4 @@
+package another;
 /**
    @version 1.21 2004-08-03
    @author Cay Horstmann
