@@ -126,21 +126,28 @@ public class MultiPriorityTaskTest {
 
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
+		int TOTAL_TASKS = 100, DEAD_TIME = 10;
+		if (args.length >= 1) {
+			TOTAL_TASKS = Integer.parseInt(args[0]);
+		}
+		if (args.length >= 2) {
+			DEAD_TIME = Integer.parseInt(args[1]);
+		}
+
 		MultiPriorityTaskTest mptt = new MultiPriorityTaskTest();
 		mptt.start();
 
-		for (int i = 0; i < 1000000; i++) {
+		for (int i = 0; i < TOTAL_TASKS; i++) {
 			int priority = (int) (Math.random() * 10) + 1;
 			Task task = mptt.new MyTask("task" + i, priority);
 			mptt.addTask(task, priority);
+			if (i % PRIORITY_NUM == 0) {
+				Thread.sleep(1);
+			}
 		}
 
-		try {
-			Thread.sleep(1000 * 60);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		Thread.sleep(1000 * DEAD_TIME);
 
 		mptt.stop();
 	}
