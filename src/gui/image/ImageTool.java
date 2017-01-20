@@ -28,8 +28,8 @@ public class ImageTool {
 	}
 
 	public static void test() throws Exception {
-		String name = "image/SymbolImg.png";
-		name = "image/SymbolImg_AOR.gif";
+		String name = "images/symbol/SymbolImg.png";
+		name = "images/symbol/SymbolImg_AOR.gif";
 		File imageFile = new File(name);
 		System.out.println(imageFile.exists());
 
@@ -59,13 +59,13 @@ public class ImageTool {
 		System.out.println(image);
 
 		// BufferedImage bufImage = convert2BufferedImage(image);
-		// writeImage(bufImage, new File("image/temp.gif"), true);
+		// writeImage(bufImage, new File("images/symbol/temp.gif"), true);
 
 		ImageIcon icon = new ImageIcon(image);
 		System.out.println(icon.getClass());
 		System.out.println(icon.getIconWidth() + "*" + icon.getIconHeight());
 
-		writeImageIcon(icon, new File("image/temp.gif"), true);
+		writeImageIcon(icon, new File("images/symbol/temp.gif"), true);
 		JOptionPane.showConfirmDialog(null, "232", "YoSi", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE,
 				icon);
 	}

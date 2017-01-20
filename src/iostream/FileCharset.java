@@ -113,7 +113,7 @@ public class FileCharset {
 		Charset defaultCharset = Charset.defaultCharset();
 		System.out.println(defaultCharset);
 		
-		String file_name = "text_file2.txt";
+		String file_name = "text/text_file2.txt";
 		String charset_name = get_charset(new File(file_name));
 		System.out.println(charset_name);
 		charset_name = codeString(file_name);

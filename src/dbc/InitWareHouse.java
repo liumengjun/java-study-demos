@@ -17,7 +17,7 @@ public class InitWareHouse {
 			PrintWriter writer;
 			data=new String[n];
 			
-			writer=new PrintWriter("product.txt");
+			writer=new PrintWriter("text/db/product.txt");
 			rand.setSeed(46541237854L);
 			for(int i=0;i<500;i++){
 				buf=new StringBuffer("");
@@ -73,7 +73,7 @@ public class InitWareHouse {
 		
 		rand.setSeed(46541237854L);
 		try {
-			writer = new PrintWriter("employees.txt");
+			writer = new PrintWriter("text/db/employees.txt");
 			for (int i = 0; i < 100; i++) {
 				buf=new StringBuffer("");
 				for(int j=0;j<6;j++)
@@ -120,7 +120,7 @@ public class InitWareHouse {
 		
 		rand.setSeed(46541237854L);
 		try {
-			writer = new PrintWriter("empPass.txt");
+			writer = new PrintWriter("text/db/empPass.txt");
 			for (int i = 0; i < 100; i++) {
 				buf=new StringBuffer("");
 				for(int j=0;j<3;j++)
@@ -160,7 +160,7 @@ public class InitWareHouse {
 		
 		rand.setSeed(46541237854L);
 		try {
-			writer = new PrintWriter("wareHouse.txt");
+			writer = new PrintWriter("text/db/wareHouse.txt");
 			for (int i = 0; i < 5; i++) {
 				buf=new StringBuffer("");
 				for(int j=0;j<3;j++)

@@ -1678,13 +1678,13 @@ class Block implements Runnable {
 		Color3f presentMianColor;
 		//面图
 		String presentImageFile;
-		mianImageFile[0] = "IMG\\coverRight.jpg";
-		mianImageFile[1] = "IMG\\coverLeft.jpg";
-		mianImageFile[2] = "IMG\\coverUp.jpg";
-		mianImageFile[3] = "IMG\\coverDown.jpg";
-		mianImageFile[4] = "IMG\\coverFront.jpg";
-		mianImageFile[5] = "IMG\\coverBehind.jpg";
-		mianImageFile[6] = "IMG\\coverCenter.jpg";
+		mianImageFile[0] = "images\\rubik\\coverRight.jpg";
+		mianImageFile[1] = "images\\rubik\\coverLeft.jpg";
+		mianImageFile[2] = "images\\rubik\\coverUp.jpg";
+		mianImageFile[3] = "images\\rubik\\coverDown.jpg";
+		mianImageFile[4] = "images\\rubik\\coverFront.jpg";
+		mianImageFile[5] = "images\\rubik\\coverBehind.jpg";
+		mianImageFile[6] = "images\\rubik\\coverCenter.jpg";
 		//点数据结构
 		Vector3f mianxin = new Vector3f();
 		Vector3f[] mianxinpianyi = new Vector3f[6];

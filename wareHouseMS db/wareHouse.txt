@@ -1,5 +1,0 @@
-wareHouse0,1147,楼上
-wareHouse1,1967,地下室
-wareHouse2,2473,楼上
-wareHouse3,2606,地下室
-wareHouse4,1678,楼上
