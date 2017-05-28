@@ -1,5 +1,6 @@
-# ºöÂÔÎÄ¼ş¼Ğ bin
 bin/
 .settings/
+.idea/
+*.iml
 
 temp/

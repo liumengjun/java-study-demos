@@ -91,16 +91,16 @@ public class TreeMapTest {
 					if (p == parent(node)) {
 						if (left(p) == node && right(p) != null) {
 							// left is earlier then right
-							visitBuffer.append("��������");
+							visitBuffer.append("├───");
 						} else {
-							visitBuffer.append("��������");
+							visitBuffer.append("└───");
 						}
 					} else {
 						if ((left(p) == null || left(p) != null && visited(left(p)))
 								&& (right(p) == null || right(p) != null && visited(right(p)))) {
 							visitBuffer.append("    ");
 						} else {
-							visitBuffer.append("��   ");
+							visitBuffer.append("│   ");
 						}
 					}
 				}
@@ -172,10 +172,10 @@ public class TreeMapTest {
 						visitBuffer.append("    ");
 						_levelPos.value++;
 					}
-					visitBuffer.append("����������");
+					visitBuffer.append("┌────");
 					_levelPos.value++;
 					for (i++; i < lw; i++) {
-						visitBuffer.append("��������");
+						visitBuffer.append("────");
 						_levelPos.value++;
 					}
 				}
@@ -184,7 +184,7 @@ public class TreeMapTest {
 					int pPos = levelPos(p);
 					pPos += (node == left(p)) ? (-widthLeft(p) - 1) : (widthLeft(node) + 1);
 					while (_levelPos.value < pPos) {
-						visitBuffer.append((left(node) != null) ? "��������" : "      ");
+						visitBuffer.append((left(node) != null) ? "────" : "      ");
 						_levelPos.value++;
 					}
 				}
@@ -194,10 +194,10 @@ public class TreeMapTest {
 				if (right(node) != null) {
 					int rlw = widthLeft(right(node)) + 1;
 					for (int i = 1; i < rlw; i++) {
-						visitBuffer.append("��������");
+						visitBuffer.append("────");
 						_levelPos.value++;
 					}
-					visitBuffer.append("��������");
+					visitBuffer.append("───┐");
 					_levelPos.value++;
 				}
 				if (parent(node) != null) {
@@ -352,7 +352,7 @@ public class TreeMapTest {
 	
 	private static boolean color(Object obj) {
 		try {
-			return (Boolean)entryFieldMap.get("color").get(obj);
+			return (boolean)entryFieldMap.get("color").get(obj);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
