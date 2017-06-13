@@ -2,6 +2,8 @@ package tree;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -10,7 +12,6 @@ public class BinaryTree<T> {
 	BinaryNode<T> root;
 
 	/**
-	 * 
 	 * @param data
 	 */
 	public BinaryNode<T> insert(T data) {
@@ -39,7 +40,6 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
 	 * @param data
 	 */
 	public boolean delete(T data) {
@@ -86,7 +86,6 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
 	public int height() {
@@ -94,7 +93,6 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
 	int weight() {
@@ -114,7 +112,6 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
 	public int size() {
@@ -122,7 +119,6 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
 	 * @return
 	 */
 	boolean isEmpty() {
@@ -130,7 +126,6 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
 	 * @param target
 	 * @return
 	 */
@@ -160,7 +155,6 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
 	 * @param target
 	 * @return
 	 */
@@ -170,7 +164,7 @@ public class BinaryTree<T> {
 
 	/**
 	 * for traverse: just print
-	 * 
+	 *
 	 * @param node
 	 */
 	private void visit(BinaryNode<T> node) {
@@ -183,24 +177,22 @@ public class BinaryTree<T> {
 
 	/**
 	 * for traverse
-	 * 
-	 * @author
-	 * 
+	 *
 	 * @param <T>
+	 * @author
 	 */
 	interface VisitInterface<T> {
 		void visit(BinaryNode<T> node);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void preOrder() {
 		preOrder(this.root, null);
 	}
 
 	/**
-	 * 
 	 * @param visitor
 	 */
 	void preOrder(VisitInterface<T> visitor) {
@@ -220,14 +212,13 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void middleOrder() {
 		middleOrder(this.root, null);
 	}
 
 	/**
-	 * 
 	 * @param visitor
 	 */
 	void middleOrder(VisitInterface<T> visitor) {
@@ -247,14 +238,13 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void postOrder() {
 		postOrder(this.root, null);
 	}
 
 	/**
-	 * 
 	 * @param visitor
 	 */
 	void postOrder(VisitInterface<T> visitor) {
@@ -274,14 +264,13 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	void levelOrder() {
 		levelOrder(null);
 	}
 
 	/**
-	 * 
 	 * @param visitor
 	 */
 	void levelOrder(VisitInterface<T> visitor) {
@@ -309,7 +298,7 @@ public class BinaryTree<T> {
 
 	/**
 	 * another levelOrder: with processing when one level is end
-	 * 
+	 *
 	 * @param visitor
 	 */
 	void levelOrder2(VisitInterface<T> visitor) {
@@ -361,7 +350,68 @@ public class BinaryTree<T> {
 	}
 
 	/**
+	 * 以Z字形走向层次遍历二叉树
+	 */
+	public void levelOrderInZigzag() {
+		this.levelOrderInZigzag(null);
+	}
+
+	/**
+	 * 以Z字形走向层次遍历二叉树
 	 * 
+	 * @param visitor
+	 */
+	public void levelOrderInZigzag(VisitInterface<T> visitor) {
+		if (this.root == null) {
+			return;
+		}
+
+		boolean forward = true;
+		// 节点遍历队列，标志着节点处理顺序
+		Queue<BinaryNode<T>> queue = new LinkedList<BinaryNode<T>>();
+		// 当前层节点栈，以便收集下一层节点
+		Deque<BinaryNode<T>> curLevelStack = new ArrayDeque<BinaryNode<T>>();
+		queue.add(this.root);
+		queue.add(null); // null节点标识着一层的结束
+
+		while (!queue.isEmpty()) {
+			BinaryNode<T> curNode = queue.poll();
+			if (visitor != null) {
+				visitor.visit(curNode);
+			} else {
+				visit(curNode);
+			}
+			if (curNode != null) {
+				curLevelStack.add(curNode); // 收集当前层节点
+			} else {
+				// null节点，一层结束后，反向收集下一层节点
+				Iterator<BinaryNode<T>> itr = curLevelStack.descendingIterator();
+				while (itr.hasNext()) {
+					BinaryNode<T> tmp = itr.next();
+					if (forward) {
+						if (tmp.leftChild != null)
+							queue.add(tmp.leftChild);
+						if (tmp.rightChild != null)
+							queue.add(tmp.rightChild);
+					} else {
+						if (tmp.rightChild != null)
+							queue.add(tmp.rightChild);
+						if (tmp.leftChild != null)
+							queue.add(tmp.leftChild);
+					}
+				}
+				if (queue.isEmpty()) { // 下一层没有节点，直接退出
+					break;
+				}
+				queue.add(null);// null节点标识着一层的结束
+				forward = !forward;// 反向
+				curLevelStack.clear();// 当前层全部处理完毕
+			}
+		}
+	}
+
+	/**
+	 *
 	 */
 	public void show() {
 		System.out.println(toString());
@@ -436,7 +486,7 @@ public class BinaryTree<T> {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void show2() {
 		System.out.println(toString2());
@@ -444,7 +494,7 @@ public class BinaryTree<T> {
 
 	/**
 	 * use preOrder(visitor)
-	 * 
+	 *
 	 * @return
 	 */
 	public String toString2() {
@@ -483,7 +533,7 @@ public class BinaryTree<T> {
 						}
 					} else {
 						if ((p.leftChild == null || p.leftChild != null && p.leftChild.visited)
-								&& (p.rightChild == null || p.rightChild != null && p.rightChild.visited)) {
+		                        && (p.rightChild == null || p.rightChild != null && p.rightChild.visited)) {
 							visitBuffer.append("    ");
 						} else {
 							visitBuffer.append("│   ");

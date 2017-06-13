@@ -5,21 +5,21 @@ import java.util.Random;
 public class TreeTest {
 
 	public static void main(String[] args) {
-//		testTree(args);
+		testTree(args);
 		// testBST(args);
 		// testAVL(args);
-		testAVL2();
+		// testAVL2();
 	}
-	
+
 	public static void testAVL2() {
-//		AVLTree<Integer> tree = new AVLTree<Integer>();
+		// AVLTree<Integer> tree = new AVLTree<Integer>();
 		AVLTree<Character> tree = new AVLTree<Character>();
 		// do test
 		for (int key = 1, value = 'a'; value <= 'z'; value++, key++) {
-//			tree.insert(key);
-			tree.insert((char)value);
+			// tree.insert(key);
+			tree.insert((char) value);
 		}
-		
+
 		System.out.println("size: " + tree.size());
 		System.out.println("show:");
 		tree.show();
@@ -38,7 +38,7 @@ public class TreeTest {
 			num[i] = data;
 		}
 		for (int i = 0; i < num.length; i++) {
-//			System.out.println(num[i]+",");
+			// System.out.println(num[i]+",");
 			tree.insert(num[i]);
 		}
 		System.out.println();
@@ -62,7 +62,7 @@ public class TreeTest {
 		System.out.print(" levelOrder:");
 		tree.levelOrder();
 		System.out.println();
-		
+
 		System.out.println("show:");
 		tree.show();
 		System.out.println("show2:");
@@ -83,7 +83,7 @@ public class TreeTest {
 		for (int i = 1; i <= num.length / 2; i++) {
 			int target = num[new Random().nextInt(num.length)];
 			boolean flag = tree.delete(target);
-//			System.out.println("to delete " + target + ", result = " + flag);
+			// System.out.println("to delete " + target + ", result = " + flag);
 		}
 
 		System.out.println();
@@ -107,7 +107,7 @@ public class TreeTest {
 		System.out.print(" levelOrder:");
 		tree.levelOrder();
 		System.out.println();
-		
+
 		System.out.println("show:");
 		tree.show();
 
@@ -249,6 +249,8 @@ public class TreeTest {
 		tree.show();
 		System.out.println("show2:");
 		tree.show2();
+		System.out.println(" levelOrder in Zigzag:");
+		tree.levelOrderInZigzag();
 
 		for (int i = 0; i < N + 2; i++) {
 			System.out.println("contains(" + i + "): " + tree.contains(i));
@@ -284,6 +286,8 @@ public class TreeTest {
 		tree.show();
 		System.out.println("show2:");
 		tree.show2();
+		System.out.println(" levelOrder in Zigzag:");
+		tree.levelOrderInZigzag();
 
 		for (int i = 0; i < N + 2; i++) {
 			System.out.println("contains(" + i + "): " + tree.contains(i));
