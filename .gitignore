@@ -4,3 +4,5 @@ bin/
 *.iml
 
 temp/
+employee.dat
+text/汉字.txt
