@@ -1,21 +1,19 @@
 package algorism;
 /**
-   @version 1.21 2004-08-03
+   @version 1.0 2004-08-03
    @author Cay Horstmann
 */
 
-import java.util.BitSet;
-
-
 /** 
-    This program runs the Sieve of Erathostenes benchmark.
+    This program runs the Sieve of Erathostenes benchmark,
+    using a handwritten BitSet class instead of the library class.
     It computes all primes up to 2,000,000. 
 */
-public class Sieve
+public class Sieve2
 {  
    public static void main(String[] s)
    {  
-      int n = 2000000;
+      int n = 2000001;
       long start = System.currentTimeMillis();
       BitSet b = new BitSet(n + 1);
       int count = 0;
@@ -48,4 +46,15 @@ public class Sieve
       System.out.println((end - start) + " milliseconds");
    }
 }
+
+class BitSet
+{
+   public BitSet(int N) { bits = new char[(N - 1) / 8 + 1]; }
+   public boolean get(int n) { return (bits[n >> 3] & (1 << (n & 7))) != 0; }   
+   public void set(int n) { bits[n >> 3] |= 1 << (n & 7); }
+   public void clear(int n) { bits[n >> 3] &= ~(1 << (n & 7)); }
+
+   private char[] bits;
+};
+
 
