@@ -3,6 +3,7 @@ package iostream;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 public class FileCharset {
@@ -16,7 +17,7 @@ public class FileCharset {
 	 */
 	public static String codeString(String fileName) throws Exception {
 		BufferedInputStream bin = new BufferedInputStream(new FileInputStream(
-				fileName));
+		        fileName));
 		int p = (bin.read() << 8) + bin.read();
 		String code = null;
 		// 其中的 0xefbb、0xfffe、0xfeff、0x5c75这些都是这个文件的前面两个字节的16进制数
@@ -44,10 +45,10 @@ public class FileCharset {
 	public static String get_charset(File file) {
 		String charset = "GBK";
 		byte[] first3Bytes = new byte[3];
+		BufferedInputStream bis = null;
 		try {
 			boolean checked = false;
-			BufferedInputStream bis = new BufferedInputStream(
-					new FileInputStream(file));
+			bis = new BufferedInputStream(new FileInputStream(file));
 			bis.mark(0);
 			int read = bis.read(first3Bytes, 0, 3);
 			if (read == -1)
@@ -56,20 +57,20 @@ public class FileCharset {
 				charset = "UTF-16LE";
 				checked = true;
 			} else if (first3Bytes[0] == (byte) 0xFE
-					&& first3Bytes[1] == (byte) 0xFF) {
+			        && first3Bytes[1] == (byte) 0xFF) {
 				charset = "UTF-16BE";
 				checked = true;
 			} else if (first3Bytes[0] == (byte) 0xEF
-					&& first3Bytes[1] == (byte) 0xBB
-					&& first3Bytes[2] == (byte) 0xBF) {
+			        && first3Bytes[1] == (byte) 0xBB
+			        && first3Bytes[2] == (byte) 0xBF) {
 				charset = "UTF-8";
 				checked = true;
 			}
-			bis.reset();
 			if (!checked) {
 				int len = 0;
 				int loc = 0;
 
+				bis.reset();
 				while ((read = bis.read()) != -1) {
 					loc++;
 					if (read >= 0xF0)
@@ -79,8 +80,8 @@ public class FileCharset {
 					if (0xC0 <= read && read <= 0xDF) {
 						read = bis.read();
 						if (0x80 <= read && read <= 0xBF)// 双字节 (0xC0 - 0xDF)
-															// (0x80 -
-															// 0xBF),也可能在GB编码内
+						                                 // (0x80 -
+						                                 // 0xBF),也可能在GB编码内
 							continue;
 						else
 							break;
@@ -97,23 +98,28 @@ public class FileCharset {
 							break;
 					}
 				}
-				System.out.println(loc + " " + Integer.toHexString(read));
+				// System.out.println(loc + " " + Integer.toHexString(read));
 			}
 
-			bis.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (bis != null)
+					bis.close();
+			} catch (IOException e) {
+			}
 		}
 
 		return charset;
 	}
 
 	public static void main(String[] args) throws Exception {
-		
+
 		Charset defaultCharset = Charset.defaultCharset();
 		System.out.println(defaultCharset);
-		
-		String file_name = "text/text_file2.txt";
+
+		String file_name = "text/text_file.txt";
 		String charset_name = get_charset(new File(file_name));
 		System.out.println(charset_name);
 		charset_name = codeString(file_name);
