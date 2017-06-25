@@ -1,3 +1,4 @@
+package _test;
 
 class TemplateTest<T> {
 	public void output(){

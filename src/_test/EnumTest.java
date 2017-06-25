@@ -1,3 +1,4 @@
+package _test;
 enum EnumTest {
 	FRANK("The given name of me", 423),	//
 	LIU("The family name of me");		//

@@ -4,12 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.alibaba.fastjson.JSON;
 
 public abstract class MapUtils {
 
@@ -164,35 +161,4 @@ public abstract class MapUtils {
 		return mapList.toArray(maps);
 	}
 
-	static void testFlattenMap() {
-		// Map<String, Object> m = new HashMap<>();
-		// m.put("a", 1);
-		// Map<String, Object> b = new HashMap<>();
-		// b.put("c", 2);
-		// b.put("d", new int[] { 3, 4 });
-		// m.put("b", b);
-		Map<String, Object> m = JSON.parseObject("{\"a\": 1, \"b\": { \"c\": 2, \"d\": [3,4] } }");
-		Map<String, Object> o = flattenMap(m);
-		System.out.println(JSON.toJSONString(o));
-		System.out.println(o.get("b.d").equals(((Map<String, Object>) m.get("b")).get("d")));
-	}
-
-	static void testStoreAndLoadMapArray() {
-		Map<String, String>[] mapArray = new Map[] { new HashMap(), new HashMap(), new HashMap() };
-		mapArray[0].put("key1\\", "value1");
-		mapArray[0].put("ke=y2", "va\nlue2");
-		mapArray[2].put("keyA", "val;ueA");
-		String text = storeMapArray(mapArray);
-		System.out.println(text);
-		Map<String, String>[] newMaps = loadMapArray(text);
-		for (Map<String, String> map : newMaps) {
-			System.out.println(map);
-		}
-		System.out.println("Is Same: " + Arrays.equals(mapArray, newMaps));
-	}
-
-	public static void main(String[] args) {
-		testFlattenMap();
-		testStoreAndLoadMapArray();
-	}
 }
