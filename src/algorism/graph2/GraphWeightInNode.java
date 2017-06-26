@@ -23,6 +23,7 @@ public class GraphWeightInNode {
 	class Path {
 		List<String> pathNodes = new ArrayList<String>();
 		int weight;
+		boolean closeCycle;
 
 		Path addNode(String node) {
 			pathNodes.add(node);
@@ -34,6 +35,7 @@ public class GraphWeightInNode {
 			Path that = new Path();
 			that.pathNodes.addAll(this.pathNodes);
 			that.weight = this.weight;
+			that.closeCycle = this.closeCycle;
 			return that;
 		}
 
@@ -130,16 +132,34 @@ public class GraphWeightInNode {
 			Queue<Path> morePaths = new ArrayDeque<>();
 			boolean hasFurtherLink = false;
 			for (Path p : paths) {
+				if (p.closeCycle) {
+					// 封闭环，终结该路径遍历，仍然保留该路径
+					morePaths.add(p);
+				}
 				// 获取已知路径的最后一个节点
 				String lastNode = p.getLastNode();
+				int nPos = p.pathNodes.indexOf(lastNode);
+				boolean hasCycle = (nPos != -1 && nPos != p.pathNodes.size() - 1);
 				Set<String> toNodes = links.get(lastNode);
 				if (toNodes != null && !toNodes.isEmpty()) {
+					boolean hasNextNode = false;
 					// 添加后续节点到新的路径
 					for (String toNode : toNodes) {
-						Path furtherPath = p.copy().addNode(toNode);
-						morePaths.add(furtherPath);
+						int idxToNode = p.pathNodes.indexOf(toNode);
+						if (hasCycle && idxToNode > nPos) {
+							// 环内节点，不处理
+						} else {
+							Path furtherPath = p.copy().addNode(toNode);
+							morePaths.add(furtherPath);
+							hasFurtherLink = true;
+							hasNextNode = true;
+						}
 					}
-					hasFurtherLink = true;
+					if (hasCycle && !hasNextNode) {
+						// 检测到封闭环，更新该路径并保存
+						p.closeCycle = true;
+						morePaths.add(p);
+					}
 				} else {
 					// 仍然保留该路径
 					morePaths.add(p);
