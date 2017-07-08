@@ -3,25 +3,25 @@ package sys;
 import java.io.PrintWriter;
 
 /**
- * Êä³öºº×Ö£¬ÎÄ¼ş±àÂëGBK
+ * è¾“å‡ºæ±‰å­—ï¼Œæ–‡ä»¶ç¼–ç GBK
  */
 public class RandomChineseWord {
-	public static void main(String[] args) {
-		char ch;
-		try {
-			PrintWriter writer = new PrintWriter("text/ºº×Ö.txt");
-			for (int i = 19968, j = 1; i < 40870; i++, j++) {
-				ch = (char) i;
-				writer.print(i + ":\t" + ch + ",\t");
-				if (j == 16) {
-					writer.print("\n");
-					j = 0;
-				}
-			}
-			writer.close();
-			System.out.println("Çë¿´\"text/ºº×Ö.txt\"ÎÄ¼ş¡£");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        char ch;
+        try {
+            PrintWriter writer = new PrintWriter("text/æ±‰å­—.txt", "GBK");
+            for (int i = 19968, j = 1; i < 40870; i++, j++) {
+                ch = (char) i;
+                writer.print(i + ":\t" + ch + ",\t");
+                if (j == 16) {
+                    writer.print("\n");
+                    j = 0;
+                }
+            }
+            writer.close();
+            System.out.println("è¯·çœ‹\"text/æ±‰å­—.txt\"æ–‡ä»¶ã€‚");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

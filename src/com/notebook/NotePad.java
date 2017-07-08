@@ -14,153 +14,153 @@ import javax.swing.JTextArea;
 
 @SuppressWarnings("serial")
 public class NotePad extends JFrame {
-	JTextArea jta;
+    JTextArea jta;
 
-	class newl implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			jta.setText("");
-		}
-	}
+    class newl implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            jta.setText("");
+        }
+    }
 
-	class openl implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser jf = new JFileChooser();
-			jf.showOpenDialog(NotePad.this);
+    class openl implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser jf = new JFileChooser();
+            jf.showOpenDialog(NotePad.this);
 
-		}
+        }
 
-	}
+    }
 
-	// ±£´æÎÄ¼şµÄ¼àÌı
-	class savel implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			JFileChooser jf = new JFileChooser();
-			jf.showSaveDialog(NotePad.this);
+    // ä¿å­˜æ–‡ä»¶çš„ç›‘å¬
+    class savel implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser jf = new JFileChooser();
+            jf.showSaveDialog(NotePad.this);
 
-		}
-	}
+        }
+    }
 
-	// ´òÓ¡µÄ¼àÌı ?
-	class printl implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			// PrintWriter p = new PrintWriter(NotePad.this);
-		}
-	}
+    // æ‰“å°çš„ç›‘å¬ ?
+    class printl implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            // PrintWriter p = new PrintWriter(NotePad.this);
+        }
+    }
 
-	// ÍË³ö¼ÇÊÂ±¾µÄ¼àÌı
-	class exitl implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			System.exit(0);// ÍË³ö
-		}
-	}
+    // é€€å‡ºè®°äº‹æœ¬çš„ç›‘å¬
+    class exitl implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            System.exit(0);// é€€å‡º
+        }
+    }
 
-	// ¿½±´µÄ¼àÌı
-	class copyl implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			jta.copy();
-		}
-	}
+    // æ‹·è´çš„ç›‘å¬
+    class copyl implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            jta.copy();
+        }
+    }
 
-	// Õ³ÌùµÄ¼àÌı
-	class pastel implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			jta.paste();
-		}
-	}
+    // ç²˜è´´çš„ç›‘å¬
+    class pastel implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            jta.paste();
+        }
+    }
 
-	// ¼ôÇĞµÄ¼àÌı
-	class cutl implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			jta.cut();
-		}
-	}
+    // å‰ªåˆ‡çš„ç›‘å¬
+    class cutl implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            jta.cut();
+        }
+    }
 
-	// ²éÕÒµÄ¼àÌı
+    // æŸ¥æ‰¾çš„ç›‘å¬
 
-	// Ìí¼ÓÈÕÆÚµÄ¼àÌı
-	class datel implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			Date d = new Date();
-			jta.append(d.toString());
-		}
-	}
+    // æ·»åŠ æ—¥æœŸçš„ç›‘å¬
+    class datel implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            Date d = new Date();
+            jta.append(d.toString());
+        }
+    }
 
-	// ¹¹Ôìº¯Êı
-	public NotePad() {
-		jta = new JTextArea("", 24, 40);
-		JScrollPane jsp = new JScrollPane(jta);
-		JMenuBar jmb = new JMenuBar();
-		JMenu mFile = new JMenu("File");
-		JMenu mEdit = new JMenu("Edit");
+    // æ„é€ å‡½æ•°
+    public NotePad() {
+        jta = new JTextArea("", 24, 40);
+        JScrollPane jsp = new JScrollPane(jta);
+        JMenuBar jmb = new JMenuBar();
+        JMenu mFile = new JMenu("File");
+        JMenu mEdit = new JMenu("Edit");
 
-		JMenuItem mNew = new JMenuItem("New", KeyEvent.VK_N);
-		mNew.addActionListener(new newl());
-		mFile.add(mNew);
+        JMenuItem mNew = new JMenuItem("New", KeyEvent.VK_N);
+        mNew.addActionListener(new newl());
+        mFile.add(mNew);
 
-		JMenuItem mOpen = new JMenuItem("Open", KeyEvent.VK_O);
-		mOpen.addActionListener(new openl());
-		mFile.add(mOpen);
+        JMenuItem mOpen = new JMenuItem("Open", KeyEvent.VK_O);
+        mOpen.addActionListener(new openl());
+        mFile.add(mOpen);
 
-		JMenuItem mSave = new JMenuItem("Save");
-		mSave.addActionListener(new savel());
-		mFile.add(mSave);
+        JMenuItem mSave = new JMenuItem("Save");
+        mSave.addActionListener(new savel());
+        mFile.add(mSave);
 
-		mFile.addSeparator(); // Ìí¼Ó·Ö¸îÏß
+        mFile.addSeparator(); // æ·»åŠ åˆ†å‰²çº¿
 
-		JMenuItem mPrint = new JMenuItem("Print");
-		mPrint.addActionListener(new printl());
-		mFile.add(mPrint);
+        JMenuItem mPrint = new JMenuItem("Print");
+        mPrint.addActionListener(new printl());
+        mFile.add(mPrint);
 
-		mFile.addSeparator(); // Ìí¼Ó·Ö¸îÏß
+        mFile.addSeparator(); // æ·»åŠ åˆ†å‰²çº¿
 
-		JMenuItem mExit = new JMenuItem("Exit");
-		mExit.addActionListener(new exitl());
-		mFile.add(mExit);
-		mFile.setMnemonic(KeyEvent.VK_F);
+        JMenuItem mExit = new JMenuItem("Exit");
+        mExit.addActionListener(new exitl());
+        mFile.add(mExit);
+        mFile.setMnemonic(KeyEvent.VK_F);
 
-		// ±à¼­²Ëµ¥µÄ×Ó²Ëµ¥µÄ´¦Àí
-		JMenuItem jmi;
-		jmi = new JMenuItem("Copy");
-		jmi.addActionListener(new copyl());
-		mEdit.add(jmi);
+        // ç¼–è¾‘èœå•çš„å­èœå•çš„å¤„ç†
+        JMenuItem jmi;
+        jmi = new JMenuItem("Copy");
+        jmi.addActionListener(new copyl());
+        mEdit.add(jmi);
 
-		jmi = new JMenuItem("Cut");
-		jmi.addActionListener(new cutl());
-		mEdit.add(jmi);
+        jmi = new JMenuItem("Cut");
+        jmi.addActionListener(new cutl());
+        mEdit.add(jmi);
 
-		jmi = new JMenuItem("Paste");
-		jmi.addActionListener(new pastel());
-		mEdit.add(jmi);
+        jmi = new JMenuItem("Paste");
+        jmi.addActionListener(new pastel());
+        mEdit.add(jmi);
 
-		mEdit.addSeparator(); // Ìí¼Ó·Ö¸îÏß
+        mEdit.addSeparator(); // æ·»åŠ åˆ†å‰²çº¿
 
-		jmi = new JMenuItem("Find");
+        jmi = new JMenuItem("Find");
 
-		mEdit.add(jmi);
+        mEdit.add(jmi);
 
-		jmi = new JMenuItem("FindNext");
-		mEdit.add(jmi);
-		mEdit.addSeparator();
-		jmi = new JMenuItem("Select All");
-		mEdit.add(jmi);
-		jmi = new JMenuItem("Date/Time");
-		jmi.addActionListener(new datel());
-		mEdit.add(jmi);
+        jmi = new JMenuItem("FindNext");
+        mEdit.add(jmi);
+        mEdit.addSeparator();
+        jmi = new JMenuItem("Select All");
+        mEdit.add(jmi);
+        jmi = new JMenuItem("Date/Time");
+        jmi.addActionListener(new datel());
+        mEdit.add(jmi);
 
-		jmb.add(mFile);
-		jmb.add(mEdit);
+        jmb.add(mFile);
+        jmb.add(mEdit);
 
-		this.setJMenuBar(jmb);
+        this.setJMenuBar(jmb);
 
-		this.getContentPane().add(jsp);
-		this.setSize(200, 200);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setVisible(true);
-	}
+        this.getContentPane().add(jsp);
+        this.setSize(200, 200);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setVisible(true);
+    }
 
-	//Ö÷º¯Êı£¬³ÌĞòÈë¿Úµã
-	public static void main(String s[]) {
-		new NotePad();
-	}
+    //ä¸»å‡½æ•°ï¼Œç¨‹åºå…¥å£ç‚¹
+    public static void main(String s[]) {
+        new NotePad();
+    }
 
 }

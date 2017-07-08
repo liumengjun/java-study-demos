@@ -1,4 +1,4 @@
-package iostream;
+package io.data;
 /**
    @version 1.11 2004-05-11
    @author Cay Horstmann

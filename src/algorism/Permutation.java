@@ -1,91 +1,91 @@
 package algorism;
 /**
- * È«ÅÅÁĞ
+ * å…¨æ’åˆ—
  * @author zhonglijunyi<br>
- * ·½·¨£ºnextLargestPermutation(char[])
- * 		°´×ÖµäĞò,²úÉúÏÂÒ»¸ö×î´óµÄÅÅÁĞ<br>
- * ÓĞ¸öÀı×Ó
+ * æ–¹æ³•ï¼šnextLargestPermutation(char[])
+ *      æŒ‰å­—å…¸åº,äº§ç”Ÿä¸‹ä¸€ä¸ªæœ€å¤§çš„æ’åˆ—<br>
+ * æœ‰ä¸ªä¾‹å­
  */
 public class Permutation {
-	
-	/**
-	 * ÓĞ¸öÌâÄ¿£ºÇó1,2,2,3,4,5µÄÈ«ÅÅÁĞ£¬µ«ÊÇ,4²»ÔÚµÚÈıÎ»£¬1¡¢5²»ÔÚÒ»Æğ
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		char a[] = {'1','2','2','3','4','5'};
-		String str;
-		int i,count = 1;
-		str = new String(a);
-		System.out.println(str);
-		for(i = 0; i < 720; i++){
-			if(nextLargestPermutation(a)){//°´×ÖµäĞò,²úÉúÏÂÒ»¸ö×î´óµÄÅÅÁĞ
-				if(check(a)){			//¼ì²éaµÄË³ĞòÊÇ·ñ·ûºÏÒªÇó
-					count ++;
-					str = new String(a);
-					System.out.println(str);
-				}
-			}
-		}
-		System.out.println("·ûºÏÌõ¼şµÄÊıÓĞ£º"+count+"¸ö¡£");
-	}
-	
-	/**
-	 * ¼ì²éaµÄË³ĞòÊÇ·ñ·ûºÏÒªÇó£º4²»ÔÚµÚÈıÎ»£¬1¡¢5²»ÔÚÒ»Æğ
-	 * @param a Ò»¸öÊı×é£¬±êÊ¾ĞòÁĞ
-	 * @return ·ûºÏÒªÇó·µ»Øtrue
-	 */
-	private static boolean check(char[] a){
-		if(a[2] == '4')//4ÔÚµÚÈıÎ»ÁË
-			return false;
-		int i = 0;
-		//ËÑË÷µÚÒ»¸ö 1¡¢5 ³öÏÖµÄÎ»ÖÃ
-		while((a[i] != '5') && (a[i]!='1')){
-			i++;
-		}
-		//ÏÂÒ»¸öÊÇ 1¡¢5
-		if(a[i+1] == '1' || a[i+1] == '5')
-			return false;
-		return true;
-	}
-	
-	/**
-	 * °´×ÖµäĞò,²úÉúÏÂÒ»¸ö×î´óµÄÅÅÁĞ
-	 * @param a Ò»¸öÊı×é
-	 * @return Èç¹ûÓĞÒ»¸ö¸ü´óµÄÔò·µ»Øtrue;
-	 */
-	public static boolean nextLargestPermutation(char[] a){
-		int j = a.length - 2;
-		while(a[j] >= a[j+1]){
-			j--;
-			if(j < 0)
-				return false;
-		}
-		//now j is the largest subscript(ÏÂ±ê) with a[j] < a[j+1]
-		int k = a.length - 1;
-		while(a[j] >= a[k]){
-			k--;
-		}
-		//a[k] is the smallest integer greater than a[j] to the right of a[j]
-		//interchange a[j] and a[k]
-		//System.out.println("j="+j+",k="+k);
-		char temp;
-		temp = a[j];
-		a[j] = a[k];
-		a[k] = temp;
-		int r = a.length - 1;
-		int s = j + 1;
-		//System.out.println("r="+r+",s="+s);
-		while(r > s){
-			//interchange a[r] and a[s]
-			temp = a[r];
-			a[r] = a[s];
-			a[s] = temp;
-			r--;
-			s++;
-		}
-		//this puts the tail end of the permutation after the j_th position
-		//	increasing order
-		return true;
-	}
+    
+    /**
+     * æœ‰ä¸ªé¢˜ç›®ï¼šæ±‚1,2,2,3,4,5çš„å…¨æ’åˆ—ï¼Œä½†æ˜¯,4ä¸åœ¨ç¬¬ä¸‰ä½ï¼Œ1ã€5ä¸åœ¨ä¸€èµ·
+     * @param args
+     */
+    public static void main(String[] args) {
+        char a[] = {'1','2','2','3','4','5'};
+        String str;
+        int i,count = 1;
+        str = new String(a);
+        System.out.println(str);
+        for(i = 0; i < 720; i++){
+            if(nextLargestPermutation(a)){//æŒ‰å­—å…¸åº,äº§ç”Ÿä¸‹ä¸€ä¸ªæœ€å¤§çš„æ’åˆ—
+                if(check(a)){           //æ£€æŸ¥açš„é¡ºåºæ˜¯å¦ç¬¦åˆè¦æ±‚
+                    count ++;
+                    str = new String(a);
+                    System.out.println(str);
+                }
+            }
+        }
+        System.out.println("ç¬¦åˆæ¡ä»¶çš„æ•°æœ‰ï¼š"+count+"ä¸ªã€‚");
+    }
+    
+    /**
+     * æ£€æŸ¥açš„é¡ºåºæ˜¯å¦ç¬¦åˆè¦æ±‚ï¼š4ä¸åœ¨ç¬¬ä¸‰ä½ï¼Œ1ã€5ä¸åœ¨ä¸€èµ·
+     * @param a ä¸€ä¸ªæ•°ç»„ï¼Œæ ‡ç¤ºåºåˆ—
+     * @return ç¬¦åˆè¦æ±‚è¿”å›true
+     */
+    private static boolean check(char[] a){
+        if(a[2] == '4')//4åœ¨ç¬¬ä¸‰ä½äº†
+            return false;
+        int i = 0;
+        //æœç´¢ç¬¬ä¸€ä¸ª 1ã€5 å‡ºç°çš„ä½ç½®
+        while((a[i] != '5') && (a[i]!='1')){
+            i++;
+        }
+        //ä¸‹ä¸€ä¸ªæ˜¯ 1ã€5
+        if(a[i+1] == '1' || a[i+1] == '5')
+            return false;
+        return true;
+    }
+    
+    /**
+     * æŒ‰å­—å…¸åº,äº§ç”Ÿä¸‹ä¸€ä¸ªæœ€å¤§çš„æ’åˆ—
+     * @param a ä¸€ä¸ªæ•°ç»„
+     * @return å¦‚æœæœ‰ä¸€ä¸ªæ›´å¤§çš„åˆ™è¿”å›true;
+     */
+    public static boolean nextLargestPermutation(char[] a){
+        int j = a.length - 2;
+        while(a[j] >= a[j+1]){
+            j--;
+            if(j < 0)
+                return false;
+        }
+        //now j is the largest subscript(ä¸‹æ ‡) with a[j] < a[j+1]
+        int k = a.length - 1;
+        while(a[j] >= a[k]){
+            k--;
+        }
+        //a[k] is the smallest integer greater than a[j] to the right of a[j]
+        //interchange a[j] and a[k]
+        //System.out.println("j="+j+",k="+k);
+        char temp;
+        temp = a[j];
+        a[j] = a[k];
+        a[k] = temp;
+        int r = a.length - 1;
+        int s = j + 1;
+        //System.out.println("r="+r+",s="+s);
+        while(r > s){
+            //interchange a[r] and a[s]
+            temp = a[r];
+            a[r] = a[s];
+            a[s] = temp;
+            r--;
+            s++;
+        }
+        //this puts the tail end of the permutation after the j_th position
+        //  increasing order
+        return true;
+    }
 }

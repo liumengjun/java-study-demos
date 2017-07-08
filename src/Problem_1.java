@@ -3,69 +3,69 @@ import java.io.IOException;
 import java.util.*;
 
 public class Problem_1 {
-	
-	public static void main(String[] args) throws IOException {
-		Properties property = System.getProperties();
-		String str = property.getProperty("user.dir");
-		System.out.println("µ±Ç°¹¤×÷Â·¾¶:"+str);
-		System.out.println(System.getProperty("user.dir","."));
-		File file = new File(".");
+    
+    public static void main(String[] args) throws IOException {
+        Properties property = System.getProperties();
+        String str = property.getProperty("user.dir");
+        System.out.println("å½“å‰å·¥ä½œè·¯å¾„:"+str);
+        System.out.println(System.getProperty("user.dir","."));
+        File file = new File(".");
         System.out.println(file.getPath()+"|"+file.getAbsolutePath()+"|"+file.getCanonicalPath());
         
-        System.out.println("classÎÄ¼şÂ·¾¶"+System.getProperty("java.class.path"));
+        System.out.println("classæ–‡ä»¶è·¯å¾„"+System.getProperty("java.class.path"));
         Class<Problem_1> theClass = Problem_1.class;
-		java.net.URL u = theClass.getResource("");
-		System.out.println("The Java RunTime used is ocated at : " + u);
+        java.net.URL u = theClass.getResource("");
+        System.out.println("The Java RunTime used is ocated at : " + u);
         
-		int[] a={13,24,35};
-		System.out.println("Ô­Êı×é");
-		printA(a);
-		//Ìí¼ÓÒ»¸öÊı
-		int[] b = insert(a,56);
-		System.out.println("Ìí¼ÓÒ»¸öĞÂÊıÖµ");
-		printA(b);
-		
-		String str1 = "this is a sentence";
-		String str2 = reverseSentence(str1);
-		System.out.println(str1);
-		System.out.println(str2);
-		
-		String[] s = str2.split(" ");
-		for(int i=0;i<s.length;i++){
-			System.out.println((i+1)+":"+s[i]);
-		}
-	}
-	
-	public static String reverseSentence(String a){
-		String b = "";
-		String temp=a;
-		int p2 = temp.lastIndexOf(" ");
-		while(p2!=-1){
-			b += temp.substring(p2+1)+" ";
-			temp = temp.substring(0, p2);
-			p2 = temp.lastIndexOf(" ");
-		}
-		b += temp;
-		return b;
-	}
-	
-	public static int[] insert(int[] a, int newdata){
-		int[] b = new int[a.length+1];
-		int i;
-		for(i=0;i<a.length;i++){
-			if(a[i]<newdata)
-				b[i]=a[i];
-			else
-				break;
-		}
-		b[i]=newdata;
-		for(;i<a.length;i++)
-			b[i+1]=a[i];
-		return b;
-	}
-	
-	public static void printA(int[] a){
-		for(int i=0;i<a.length;i++)
-			System.out.println(a[i]);
-	}
+        int[] a={13,24,35};
+        System.out.println("åŸæ•°ç»„");
+        printA(a);
+        //æ·»åŠ ä¸€ä¸ªæ•°
+        int[] b = insert(a,56);
+        System.out.println("æ·»åŠ ä¸€ä¸ªæ–°æ•°å€¼");
+        printA(b);
+        
+        String str1 = "this is a sentence";
+        String str2 = reverseSentence(str1);
+        System.out.println(str1);
+        System.out.println(str2);
+        
+        String[] s = str2.split(" ");
+        for(int i=0;i<s.length;i++){
+            System.out.println((i+1)+":"+s[i]);
+        }
+    }
+    
+    public static String reverseSentence(String a){
+        String b = "";
+        String temp=a;
+        int p2 = temp.lastIndexOf(" ");
+        while(p2!=-1){
+            b += temp.substring(p2+1)+" ";
+            temp = temp.substring(0, p2);
+            p2 = temp.lastIndexOf(" ");
+        }
+        b += temp;
+        return b;
+    }
+    
+    public static int[] insert(int[] a, int newdata){
+        int[] b = new int[a.length+1];
+        int i;
+        for(i=0;i<a.length;i++){
+            if(a[i]<newdata)
+                b[i]=a[i];
+            else
+                break;
+        }
+        b[i]=newdata;
+        for(;i<a.length;i++)
+            b[i+1]=a[i];
+        return b;
+    }
+    
+    public static void printA(int[] a){
+        for(int i=0;i<a.length;i++)
+            System.out.println(a[i]);
+    }
 }

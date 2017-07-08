@@ -1,17 +1,17 @@
-package date;
+package utils.date;
 import java.util.Date;
 import java.text.DateFormat;
 
 
 /**
-* ¸ñÊ½»¯Ê±¼äÀà
+* æ ¼å¼åŒ–æ—¶é—´ç±»
 * DateFormat.FULL = 0
 * DateFormat.DEFAULT = 2
 * DateFormat.LONG = 1
 * DateFormat.MEDIUM = 2
 * DateFormat.SHORT = 3
 * @author    Michael 
-* @version   1.0£¬ 2007/03/09
+* @version   1.0ï¼Œ 2007/03/09
 */
 
 public class TestDateFormat{
@@ -19,41 +19,41 @@ public class TestDateFormat{
         Date d = new Date();
         String s;
           
-        /** DateÀàµÄ¸ñÊ½: Sat Apr 16 13:17:29 CST 2006 */
+        /** Dateç±»çš„æ ¼å¼: Sat Apr 16 13:17:29 CST 2006 */
         System.out.println(d);
           
         System.out.println("******************************************");   
         
         /** getDateInstance() */ 
-        /** Êä³ö¸ñÊ½: 2006-4-16 */
+        /** è¾“å‡ºæ ¼å¼: 2006-4-16 */
         s = DateFormat.getDateInstance().format(d);
         System.out.println(s);
         
-        /** Êä³ö¸ñÊ½: 2006-4-16 */
+        /** è¾“å‡ºæ ¼å¼: 2006-4-16 */
         s = DateFormat.getDateInstance(DateFormat.DEFAULT).format(d);
         System.out.println(s);
         
-        /** Êä³ö¸ñÊ½: 2006Äê4ÔÂ16ÈÕ ĞÇÆÚÁù */
+        /** è¾“å‡ºæ ¼å¼: 2006å¹´4æœˆ16æ—¥ æ˜ŸæœŸå…­ */
         s = DateFormat.getDateInstance(DateFormat.FULL).format(d);
         System.out.println(s);
         
-        /** Êä³ö¸ñÊ½: 2006-4-16 */
+        /** è¾“å‡ºæ ¼å¼: 2006-4-16 */
         s = DateFormat.getDateInstance(DateFormat.MEDIUM).format(d);
         System.out.println(s);
         
-        /** Êä³ö¸ñÊ½: 06-4-16 */
+        /** è¾“å‡ºæ ¼å¼: 06-4-16 */
         s = DateFormat.getDateInstance(DateFormat.SHORT).format(d);
         System.out.println(s);
         
-        /** Êä³ö¸ñÊ½: 2006-01-01 00:00:00 */
+        /** è¾“å‡ºæ ¼å¼: 2006-01-01 00:00:00 */
         DateFormat format1 = new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         s = format1.format(new Date());
         System.out.println(s);
         
-        /** Êä³ö¸ñÊ½: 2006-01-01 00:00:00 */
+        /** è¾“å‡ºæ ¼å¼: 2006-01-01 00:00:00 */
         System.out.println((new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss")).format(new Date()));
         
-        /** Êä³ö¸ñÊ½: 20060101000000***/
+        /** è¾“å‡ºæ ¼å¼: 20060101000000***/
         DateFormat format2 = new java.text.SimpleDateFormat("yyyyMMddhhmmss");
         s = format2.format(new Date());
         System.out.println(s); 

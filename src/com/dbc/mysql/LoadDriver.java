@@ -1,4 +1,4 @@
-package dbc.mysql;
+package com.dbc.mysql;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;

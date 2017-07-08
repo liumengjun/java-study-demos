@@ -14,194 +14,194 @@ import java.util.Scanner;
 import networking.contact.Constant;
 
 public class ContactServer {
-	
-	/*¼ÇÂ¼ÔÚÏßÓÃ»§µÄÔ¶¶ËsocketµØÖ·ĞÅÏ¢*/
-	private static Hashtable<Integer, SocketAddress>	online_users		= new Hashtable<Integer, SocketAddress>();
-	/*Á´½ÓÇëÇóÈÎÎñ¶ÓÁĞ, <id1, id2>: id1ÇëÇó²¦ºÅµ½id2*/
-	private static Hashtable<Integer, Integer>			conn_request_queue	= new Hashtable<Integer, Integer>();
-	/*¼ÇÂ¼ÔÚÏßÓÃ»§µÄ¸÷×ÔÕìÌı¶Ë¿ÚĞÅÏ¢*/
-	private static Hashtable<Integer, Integer>			users_listen_port	= new Hashtable<Integer, Integer>();
-	
-	public static void main(String[] args) {
-		startServer();
-	}
-	
-	/**
-	 * Æô¶¯·şÎñ
-	 */
-	public static void startServer() {
-		try {
-			// establish server socket
-			
-			ServerSocket ss = new ServerSocket(Constant.SERVER_LISTENING_PORT);
-			
-			int i = 1;
-			while (true) {
-				// wait for client connection
-				Socket incoming = ss.accept();
-				// local info
-				System.out.println(incoming.getLocalSocketAddress());
-				// remote info
-				System.out.println(incoming.getRemoteSocketAddress());
-				System.out.println("accept: " + i);
-				online_users.put(i, incoming.getRemoteSocketAddress());
-				ClientSocketProcessing csp = new ClientSocketProcessing(incoming, i);
-				new Thread(csp).start();
-				i++;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/*°ï×éĞÅÏ¢×Ö·û´®*/
-	public static final String	help_info;
-	static {
-		StringBuffer helpInfoBuf = new StringBuffer(1024);
-		helpInfoBuf.append("Enter " + Constant.CMD_GET_HELP + " to get help info\n");
-		helpInfoBuf.append("Enter " + Constant.CMD_GET_ONLINE_USER + " to get all online users\n");
-		helpInfoBuf.append("Enter " + Constant.CMD_GET_CONN_TO_2 + " to get connect to XXX\n");
-		helpInfoBuf.append("Enter " + Constant.DISCONNECT_MESSAGE + " to exit\n");
-		help_info = helpInfoBuf.toString();
-	}
-	
-	/**
-	 * Ò»¸öclientµÄsocketÁ´½ÓµÄ´¦ÀíÏß³Ì
-	 */
-	private static class ClientSocketProcessing implements Runnable {
-		
-		private Socket	incoming;
-		private int		id;
-		
-		public ClientSocketProcessing(Socket incoming, int id) {
-			this.incoming = incoming;
-			this.id = id;
-		}
-		
-		public void run() {
-			try {
-				try {
-					InputStream inStream = incoming.getInputStream();
-					OutputStream outStream = incoming.getOutputStream();
-					Scanner in = new Scanner(inStream);
-					PrintWriter out = new PrintWriter(outStream, true /* autoFlush */);
-					out.println(Constant.RES_SESSION_ID_HEADER + Constant.PORT_START + this.id + Constant.PORT_END);
-					out.println("Hi " + this.id + "!\n" + help_info);
-					// echo client input
-					boolean keep = true;
-					while (keep) {
-						String line = in.nextLine();
-						System.out.println("Client" + Constant.PORT_START + this.id + Constant.PORT_END + ":>" + line);
-						out.println("Echo: " + line);
-						if (Constant.DISCONNECT_MESSAGE.equalsIgnoreCase(line)) {
-							keep = false;
-						} else {
-							parseCommand(line, out);
-						}
-						if (conn_request_queue.containsValue(this.id)) {
-							// µ±Ç°ÓÃ»§±»²¦ºÅÁË£¬µ±²»ÖªµÀËüµÄÕìÌı¶Ë¿ÚÊ±£¬ĞèÒªÑ¯ÎÊËüµÄÕìÌı¶Ë¿Ú
-							if (!users_listen_port.containsKey(this.id)) {
-								out.println(Constant.CMD_WHAT_IS_YOUR_PORT);
-							}
-						} else if (conn_request_queue.containsKey(this.id)) {
-							// µ±Ç°ÓÃ»§ÓĞ¸ö²¦ºÅÇëÇó£¬Ê×ÏÈ»ñµÃÄ¿µÄÓÃ»§id
-							int destId = conn_request_queue.get(this.id);
-							// Ê×ÏÈÅĞ¶ÏÄ¿µÄÓÃ»§ÔÚ²»ÔÚÏß£¬Èô²»ÔÚÏß£¬É¾³ıÄ¿µÄÓÃ»§µÄÕìÌı¶Ë¿ÚĞÅÏ¢
-							// ÈôÒÑ¾­ÖªµÀÄ¿µÄÓÃ»§µÄÕìÌı¶Ë¿Ú£¬Ôò»ØÓ¦µ±Ç°ÓÃ»§£¬²¢½«¸ÃÇëÇó´ÓÈÎÎñ¶ÓÁĞÉ¾³ı£»·ñÔòµÈ´ı£¬Ñ¯ÎÊÄ¿µÄÓÃ»§ËüµÄÕìÌı¶Ë¿Ú
-							SocketAddress destAddress = online_users.get(destId);
-							if (destAddress == null) {
-								out.println(Constant.CONN_TO_2_RESULT_HEADER + "(250)" + Constant.PORT_START + destId
-										+ Constant.PORT_END + "{Not Online!}");
-								users_listen_port.remove(destId);// Çå³ı´íÎóµÄĞÅÏ¢
-							} else {
-								if (users_listen_port.containsKey(destId)) {
-									InetAddress ip = ((InetSocketAddress) destAddress).getAddress();
-									int port = users_listen_port.get(destId);
-									InetSocketAddress rightAddres = new InetSocketAddress(ip, port);
-									out.println(Constant.CONN_TO_2_RESULT_HEADER + "(123)" + Constant.PORT_START + destId
-											+ Constant.PORT_END + "{" + rightAddres + "}");
-									// É¾³ıµ±Ç°ÓÃ»§µÄÇëÇóÈÎÎñ
-									conn_request_queue.remove(this.id);
-								}
-							}
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					incoming.close();
-					online_users.remove(this.id);
-					System.out.println("No." + this.id + " is close!");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		/**
-		 * ½âÎöclient¶Î·µ»ØµÄ×Ö·û´®£¬ÃüÁî£¬»ò»ØÓ¦×Ö·û´®
-		 * 
-		 * @param line
-		 * @param out
-		 */
-		private void parseCommand(String line, PrintWriter out) {
-			String curCmd = line.trim();
-			if (Constant.CMD_GET_HELP.equalsIgnoreCase(curCmd)) {
-				out.println(help_info);
-			} else if (Constant.CMD_GET_ONLINE_USER.equalsIgnoreCase(curCmd)) {
-				String onlineUserStr = online_users.toString();
-				out.println(Constant.ONLINE_USERS_HEADER + onlineUserStr);
-			} else if (curCmd.toUpperCase().startsWith(Constant.CMD_GET_CONN_TO_2_PRE)) {
-				int destCodeStart = Constant.CMD_GET_CONN_TO_2_PRE.length();
-				int destCodeEnd = curCmd.indexOf(Constant.CMD_GET_CONN_TO_2_END, destCodeStart + 1);
-				if (destCodeEnd < 0) {
-					out.println(Constant.BAD_CMD_ERROR + " \"" + curCmd + "\"");
-				} else {
-					String destCode = curCmd.substring(destCodeStart, destCodeEnd);
-					try {
-						int destCodeInt = Integer.parseInt(destCode);
-						if (destCodeInt == this.id) {
-							out.println(Constant.CONN_TO_2_RESULT_HEADER + "(250)" + Constant.PORT_START + destCode
-									+ Constant.PORT_END + "{Need not to connect to your self!}");
-						} else {
-							// Ê×ÏÈÅĞ¶ÏÄ¿µÄÓÃ»§ÔÚ²»ÔÚÏß£¬
-							// ÈôÔÚÏß£¬ÔÙÈ¥»ñµÃÄ¿µÄÓÃ»§µÄÕìÌı¶Ë¿Ú
-							// ÈôÒÑ¾­ÖªµÀÄ¿µÄÓÃ»§µÄÕìÌı¶Ë¿Ú£¬Ôò»ØÓ¦µ±Ç°ÓÃ»§£»·ñÔò¼ÓÈëÈÎÎñ¶ÓÁĞ£¬ĞèÒªÑ¯ÎÊÄ¿µÄÓÃ»§ËüµÄÕìÌı¶Ë¿Ú
-							SocketAddress destAddress = online_users.get(destCodeInt);
-							if (destAddress == null) {
-								out.println(Constant.CONN_TO_2_RESULT_HEADER + "(250)" + Constant.PORT_START + destCodeInt
-										+ Constant.PORT_END + "{Not Online!}");
-								users_listen_port.remove(destCodeInt);// Çå³ı´íÎóµÄĞÅÏ¢
-							} else {
-								if (users_listen_port.containsKey(destCodeInt)) {
-									InetAddress ip = ((InetSocketAddress) destAddress).getAddress();
-									int port = users_listen_port.get(destCodeInt);
-									InetSocketAddress rightAddres = new InetSocketAddress(ip, port);
-									out.println(Constant.CONN_TO_2_RESULT_HEADER + "(123)" + Constant.PORT_START + destCodeInt
-											+ Constant.PORT_END + "{" + rightAddres + "}");
-								} else {
-									// this.idÇëÇó²¦ºÅdestCodeInt£¬¼ÓÈëÈÎÎñ¶ÓÁĞ
-									conn_request_queue.put(this.id, destCodeInt);
-								}
-							}
-						}
-					} catch (Exception e) {
-						out.println(Constant.BAD_CMD_ERROR + " \"" + curCmd + "\"");
-					}
-				}
-			} else if (Constant.CMD_WHAT_IS_SESSION_ID.equalsIgnoreCase(curCmd)) {
-				// clientÇëÇóµ±Ç°session id
-				out.println(Constant.RES_SESSION_ID_HEADER + Constant.PORT_START + this.id + Constant.PORT_END);
-			} else if (line.startsWith(Constant.RES_LISTEN_PORT_HEADER)) {
-				// ½âÎöclient·µ»ØµÄ£¬ËûËùÕìÌı¶Ë¿ÚĞÅÏ¢×Ö·û´®
-				int posOfEnd = line.indexOf(Constant.PORT_END, Constant.RES_LISTEN_PORT_HEADER.length() + 2);
-				String listenPortStr = line.substring(Constant.RES_LISTEN_PORT_HEADER.length() + 1, posOfEnd);
-				System.out.println(listenPortStr);
-				try {
-					int listenPortInt = Integer.parseInt(listenPortStr);
-					users_listen_port.put(this.id, listenPortInt);
-				} catch (Exception e) {}
-			}
-		}
-	}
+    
+    /*è®°å½•åœ¨çº¿ç”¨æˆ·çš„è¿œç«¯socketåœ°å€ä¿¡æ¯*/
+    private static Hashtable<Integer, SocketAddress>    online_users        = new Hashtable<Integer, SocketAddress>();
+    /*é“¾æ¥è¯·æ±‚ä»»åŠ¡é˜Ÿåˆ—, <id1, id2>: id1è¯·æ±‚æ‹¨å·åˆ°id2*/
+    private static Hashtable<Integer, Integer>          conn_request_queue  = new Hashtable<Integer, Integer>();
+    /*è®°å½•åœ¨çº¿ç”¨æˆ·çš„å„è‡ªä¾¦å¬ç«¯å£ä¿¡æ¯*/
+    private static Hashtable<Integer, Integer>          users_listen_port   = new Hashtable<Integer, Integer>();
+    
+    public static void main(String[] args) {
+        startServer();
+    }
+    
+    /**
+     * å¯åŠ¨æœåŠ¡
+     */
+    public static void startServer() {
+        try {
+            // establish server socket
+            
+            ServerSocket ss = new ServerSocket(Constant.SERVER_LISTENING_PORT);
+            
+            int i = 1;
+            while (true) {
+                // wait for client connection
+                Socket incoming = ss.accept();
+                // local info
+                System.out.println(incoming.getLocalSocketAddress());
+                // remote info
+                System.out.println(incoming.getRemoteSocketAddress());
+                System.out.println("accept: " + i);
+                online_users.put(i, incoming.getRemoteSocketAddress());
+                ClientSocketProcessing csp = new ClientSocketProcessing(incoming, i);
+                new Thread(csp).start();
+                i++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /*å¸®ç»„ä¿¡æ¯å­—ç¬¦ä¸²*/
+    public static final String  help_info;
+    static {
+        StringBuffer helpInfoBuf = new StringBuffer(1024);
+        helpInfoBuf.append("Enter " + Constant.CMD_GET_HELP + " to get help info\n");
+        helpInfoBuf.append("Enter " + Constant.CMD_GET_ONLINE_USER + " to get all online users\n");
+        helpInfoBuf.append("Enter " + Constant.CMD_GET_CONN_TO_2 + " to get connect to XXX\n");
+        helpInfoBuf.append("Enter " + Constant.DISCONNECT_MESSAGE + " to exit\n");
+        help_info = helpInfoBuf.toString();
+    }
+    
+    /**
+     * ä¸€ä¸ªclientçš„socketé“¾æ¥çš„å¤„ç†çº¿ç¨‹
+     */
+    private static class ClientSocketProcessing implements Runnable {
+        
+        private Socket  incoming;
+        private int     id;
+        
+        public ClientSocketProcessing(Socket incoming, int id) {
+            this.incoming = incoming;
+            this.id = id;
+        }
+        
+        public void run() {
+            try {
+                try {
+                    InputStream inStream = incoming.getInputStream();
+                    OutputStream outStream = incoming.getOutputStream();
+                    Scanner in = new Scanner(inStream);
+                    PrintWriter out = new PrintWriter(outStream, true /* autoFlush */);
+                    out.println(Constant.RES_SESSION_ID_HEADER + Constant.PORT_START + this.id + Constant.PORT_END);
+                    out.println("Hi " + this.id + "!\n" + help_info);
+                    // echo client input
+                    boolean keep = true;
+                    while (keep) {
+                        String line = in.nextLine();
+                        System.out.println("Client" + Constant.PORT_START + this.id + Constant.PORT_END + ":>" + line);
+                        out.println("Echo: " + line);
+                        if (Constant.DISCONNECT_MESSAGE.equalsIgnoreCase(line)) {
+                            keep = false;
+                        } else {
+                            parseCommand(line, out);
+                        }
+                        if (conn_request_queue.containsValue(this.id)) {
+                            // å½“å‰ç”¨æˆ·è¢«æ‹¨å·äº†ï¼Œå½“ä¸çŸ¥é“å®ƒçš„ä¾¦å¬ç«¯å£æ—¶ï¼Œéœ€è¦è¯¢é—®å®ƒçš„ä¾¦å¬ç«¯å£
+                            if (!users_listen_port.containsKey(this.id)) {
+                                out.println(Constant.CMD_WHAT_IS_YOUR_PORT);
+                            }
+                        } else if (conn_request_queue.containsKey(this.id)) {
+                            // å½“å‰ç”¨æˆ·æœ‰ä¸ªæ‹¨å·è¯·æ±‚ï¼Œé¦–å…ˆè·å¾—ç›®çš„ç”¨æˆ·id
+                            int destId = conn_request_queue.get(this.id);
+                            // é¦–å…ˆåˆ¤æ–­ç›®çš„ç”¨æˆ·åœ¨ä¸åœ¨çº¿ï¼Œè‹¥ä¸åœ¨çº¿ï¼Œåˆ é™¤ç›®çš„ç”¨æˆ·çš„ä¾¦å¬ç«¯å£ä¿¡æ¯
+                            // è‹¥å·²ç»çŸ¥é“ç›®çš„ç”¨æˆ·çš„ä¾¦å¬ç«¯å£ï¼Œåˆ™å›åº”å½“å‰ç”¨æˆ·ï¼Œå¹¶å°†è¯¥è¯·æ±‚ä»ä»»åŠ¡é˜Ÿåˆ—åˆ é™¤ï¼›å¦åˆ™ç­‰å¾…ï¼Œè¯¢é—®ç›®çš„ç”¨æˆ·å®ƒçš„ä¾¦å¬ç«¯å£
+                            SocketAddress destAddress = online_users.get(destId);
+                            if (destAddress == null) {
+                                out.println(Constant.CONN_TO_2_RESULT_HEADER + "(250)" + Constant.PORT_START + destId
+                                        + Constant.PORT_END + "{Not Online!}");
+                                users_listen_port.remove(destId);// æ¸…é™¤é”™è¯¯çš„ä¿¡æ¯
+                            } else {
+                                if (users_listen_port.containsKey(destId)) {
+                                    InetAddress ip = ((InetSocketAddress) destAddress).getAddress();
+                                    int port = users_listen_port.get(destId);
+                                    InetSocketAddress rightAddres = new InetSocketAddress(ip, port);
+                                    out.println(Constant.CONN_TO_2_RESULT_HEADER + "(123)" + Constant.PORT_START + destId
+                                            + Constant.PORT_END + "{" + rightAddres + "}");
+                                    // åˆ é™¤å½“å‰ç”¨æˆ·çš„è¯·æ±‚ä»»åŠ¡
+                                    conn_request_queue.remove(this.id);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    incoming.close();
+                    online_users.remove(this.id);
+                    System.out.println("No." + this.id + " is close!");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        /**
+         * è§£æclientæ®µè¿”å›çš„å­—ç¬¦ä¸²ï¼Œå‘½ä»¤ï¼Œæˆ–å›åº”å­—ç¬¦ä¸²
+         * 
+         * @param line
+         * @param out
+         */
+        private void parseCommand(String line, PrintWriter out) {
+            String curCmd = line.trim();
+            if (Constant.CMD_GET_HELP.equalsIgnoreCase(curCmd)) {
+                out.println(help_info);
+            } else if (Constant.CMD_GET_ONLINE_USER.equalsIgnoreCase(curCmd)) {
+                String onlineUserStr = online_users.toString();
+                out.println(Constant.ONLINE_USERS_HEADER + onlineUserStr);
+            } else if (curCmd.toUpperCase().startsWith(Constant.CMD_GET_CONN_TO_2_PRE)) {
+                int destCodeStart = Constant.CMD_GET_CONN_TO_2_PRE.length();
+                int destCodeEnd = curCmd.indexOf(Constant.CMD_GET_CONN_TO_2_END, destCodeStart + 1);
+                if (destCodeEnd < 0) {
+                    out.println(Constant.BAD_CMD_ERROR + " \"" + curCmd + "\"");
+                } else {
+                    String destCode = curCmd.substring(destCodeStart, destCodeEnd);
+                    try {
+                        int destCodeInt = Integer.parseInt(destCode);
+                        if (destCodeInt == this.id) {
+                            out.println(Constant.CONN_TO_2_RESULT_HEADER + "(250)" + Constant.PORT_START + destCode
+                                    + Constant.PORT_END + "{Need not to connect to your self!}");
+                        } else {
+                            // é¦–å…ˆåˆ¤æ–­ç›®çš„ç”¨æˆ·åœ¨ä¸åœ¨çº¿ï¼Œ
+                            // è‹¥åœ¨çº¿ï¼Œå†å»è·å¾—ç›®çš„ç”¨æˆ·çš„ä¾¦å¬ç«¯å£
+                            // è‹¥å·²ç»çŸ¥é“ç›®çš„ç”¨æˆ·çš„ä¾¦å¬ç«¯å£ï¼Œåˆ™å›åº”å½“å‰ç”¨æˆ·ï¼›å¦åˆ™åŠ å…¥ä»»åŠ¡é˜Ÿåˆ—ï¼Œéœ€è¦è¯¢é—®ç›®çš„ç”¨æˆ·å®ƒçš„ä¾¦å¬ç«¯å£
+                            SocketAddress destAddress = online_users.get(destCodeInt);
+                            if (destAddress == null) {
+                                out.println(Constant.CONN_TO_2_RESULT_HEADER + "(250)" + Constant.PORT_START + destCodeInt
+                                        + Constant.PORT_END + "{Not Online!}");
+                                users_listen_port.remove(destCodeInt);// æ¸…é™¤é”™è¯¯çš„ä¿¡æ¯
+                            } else {
+                                if (users_listen_port.containsKey(destCodeInt)) {
+                                    InetAddress ip = ((InetSocketAddress) destAddress).getAddress();
+                                    int port = users_listen_port.get(destCodeInt);
+                                    InetSocketAddress rightAddres = new InetSocketAddress(ip, port);
+                                    out.println(Constant.CONN_TO_2_RESULT_HEADER + "(123)" + Constant.PORT_START + destCodeInt
+                                            + Constant.PORT_END + "{" + rightAddres + "}");
+                                } else {
+                                    // this.idè¯·æ±‚æ‹¨å·destCodeIntï¼ŒåŠ å…¥ä»»åŠ¡é˜Ÿåˆ—
+                                    conn_request_queue.put(this.id, destCodeInt);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        out.println(Constant.BAD_CMD_ERROR + " \"" + curCmd + "\"");
+                    }
+                }
+            } else if (Constant.CMD_WHAT_IS_SESSION_ID.equalsIgnoreCase(curCmd)) {
+                // clientè¯·æ±‚å½“å‰session id
+                out.println(Constant.RES_SESSION_ID_HEADER + Constant.PORT_START + this.id + Constant.PORT_END);
+            } else if (line.startsWith(Constant.RES_LISTEN_PORT_HEADER)) {
+                // è§£æclientè¿”å›çš„ï¼Œä»–æ‰€ä¾¦å¬ç«¯å£ä¿¡æ¯å­—ç¬¦ä¸²
+                int posOfEnd = line.indexOf(Constant.PORT_END, Constant.RES_LISTEN_PORT_HEADER.length() + 2);
+                String listenPortStr = line.substring(Constant.RES_LISTEN_PORT_HEADER.length() + 1, posOfEnd);
+                System.out.println(listenPortStr);
+                try {
+                    int listenPortInt = Integer.parseInt(listenPortStr);
+                    users_listen_port.put(this.id, listenPortInt);
+                } catch (Exception e) {}
+            }
+        }
+    }
 }

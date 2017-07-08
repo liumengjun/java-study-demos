@@ -1,4 +1,4 @@
-package iostream;
+package io.nio;
 
 /**
  * @version 1.01 2004-05-11

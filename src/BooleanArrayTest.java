@@ -2,105 +2,105 @@ import java.util.Stack;
 
 
 public class BooleanArrayTest {
-	public static final int And = 0;
-	public static final int Or = 1;
-	
-	/**
-	 * 
-	 * @param relations
-	 * @param AndOrs
-	 * @return
-	 */
-	public static boolean testExpressions(boolean[] relations, int[] AndOrs){
-		if(relations.length != (AndOrs.length+1)){
-			//²Ù×÷ÊıÓ¦¸Ã±È²Ù×÷·û¶àÒ»¸ö
-			return false;
-		}
-		if(relations.length==1){
-			return relations[0];
-		}
-		Stack<Boolean> booleans = new Stack<Boolean>();
-		Stack<Integer> ops = new Stack<Integer>();
-		
-		booleans.push(new Boolean(relations[0]));
-		ops.push(new Integer(AndOrs[0]));
-		
-		int oldOp,newOp;
-		boolean flag1,flag2,flag1OpFlag2;
-		int i;
-		for(i=1;i<AndOrs.length;i++){
-			oldOp = ops.peek().intValue();	//²é¿´Õ»¶¥²Ù×÷·û
-			newOp = AndOrs[i];
-			flag1 = booleans.peek().booleanValue();	//²é¿´Õ»¶¥²Ù×÷Êı
-			flag2 = relations[i];
-			if(newOp>=oldOp){
-				//flag1 && flag2 || flag3µÄÇé¿ö
-				//flag1 && flag2 && flag3µÄÇé¿ö
-				//flag1 || flag2 || flag3µÄÇé¿ö
-				booleans.pop();	//ÒÆ³ı¶ÑÕ»¶¥²¿µÄ¶ÔÏóflag1
-				ops.pop();		//ÒÆ³ı¶ÑÕ»¶¥²¿µÄ¶ÔÏóoldOp
-				//flag1 oldOp flag2
-				if(oldOp==And)
-					flag1OpFlag2 = flag1 && flag2;
-				else//(oldOp==Or)
-					flag1OpFlag2 = flag1 || flag2;
-				booleans.push(new Boolean( flag1OpFlag2 ));
-				ops.push(new Integer(newOp));
-			}else{
-				//flag1 || flag2 && flag3µÄÇé¿ö
-				booleans.push(new Boolean( flag2 ));
-				ops.push(new Integer(newOp));
-			}
-		}
-		//System.out.println("now i="+i);
-		booleans.push(new Boolean(relations[i]));//½«×îºóÒ»¸ö²Ù×÷ÊıÑ¹Õ»
-		
-		//System.out.println(booleans.size());
-		//System.out.println(ops.size());
-		while(!ops.isEmpty()){
-			oldOp = ops.pop().intValue();
-			flag2 = booleans.pop().booleanValue();
-			flag1 = booleans.pop().booleanValue();
-			//flag1 oldOp flag2
-			if(oldOp==And)
-				flag1OpFlag2 = flag1 && flag2;
-			else//(oldOp==Or)
-				flag1OpFlag2 = flag1 || flag2;
-			booleans.push(new Boolean( flag1OpFlag2 ));
-		}
-		//System.out.println(booleans.size());
-		//System.out.println(ops.size());
-		
-		return booleans.pop().booleanValue();
-	}
-	
-	/**
-	 * ²âÊÔ
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		int n = 1;
-		boolean[] bools = new boolean[n];
-		int[] ops = new int[n-1];
-		for (int j = 0; j < n; j++) {
-			int i = 0;
-			for (i = 0; i < bools.length; i++) {
-				bools[i] = (int) (Math.random() * 2) == 1;
-			}
-			for (i = 0; i < ops.length; i++) {
-				ops[i] = (int) (Math.random() * 2);
-			}
+    public static final int And = 0;
+    public static final int Or = 1;
+    
+    /**
+     * 
+     * @param relations
+     * @param AndOrs
+     * @return
+     */
+    public static boolean testExpressions(boolean[] relations, int[] AndOrs){
+        if(relations.length != (AndOrs.length+1)){
+            //æ“ä½œæ•°åº”è¯¥æ¯”æ“ä½œç¬¦å¤šä¸€ä¸ª
+            return false;
+        }
+        if(relations.length==1){
+            return relations[0];
+        }
+        Stack<Boolean> booleans = new Stack<Boolean>();
+        Stack<Integer> ops = new Stack<Integer>();
+        
+        booleans.push(new Boolean(relations[0]));
+        ops.push(new Integer(AndOrs[0]));
+        
+        int oldOp,newOp;
+        boolean flag1,flag2,flag1OpFlag2;
+        int i;
+        for(i=1;i<AndOrs.length;i++){
+            oldOp = ops.peek().intValue();  //æŸ¥çœ‹æ ˆé¡¶æ“ä½œç¬¦
+            newOp = AndOrs[i];
+            flag1 = booleans.peek().booleanValue(); //æŸ¥çœ‹æ ˆé¡¶æ“ä½œæ•°
+            flag2 = relations[i];
+            if(newOp>=oldOp){
+                //flag1 && flag2 || flag3çš„æƒ…å†µ
+                //flag1 && flag2 && flag3çš„æƒ…å†µ
+                //flag1 || flag2 || flag3çš„æƒ…å†µ
+                booleans.pop(); //ç§»é™¤å †æ ˆé¡¶éƒ¨çš„å¯¹è±¡flag1
+                ops.pop();      //ç§»é™¤å †æ ˆé¡¶éƒ¨çš„å¯¹è±¡oldOp
+                //flag1 oldOp flag2
+                if(oldOp==And)
+                    flag1OpFlag2 = flag1 && flag2;
+                else//(oldOp==Or)
+                    flag1OpFlag2 = flag1 || flag2;
+                booleans.push(new Boolean( flag1OpFlag2 ));
+                ops.push(new Integer(newOp));
+            }else{
+                //flag1 || flag2 && flag3çš„æƒ…å†µ
+                booleans.push(new Boolean( flag2 ));
+                ops.push(new Integer(newOp));
+            }
+        }
+        //System.out.println("now i="+i);
+        booleans.push(new Boolean(relations[i]));//å°†æœ€åä¸€ä¸ªæ“ä½œæ•°å‹æ ˆ
+        
+        //System.out.println(booleans.size());
+        //System.out.println(ops.size());
+        while(!ops.isEmpty()){
+            oldOp = ops.pop().intValue();
+            flag2 = booleans.pop().booleanValue();
+            flag1 = booleans.pop().booleanValue();
+            //flag1 oldOp flag2
+            if(oldOp==And)
+                flag1OpFlag2 = flag1 && flag2;
+            else//(oldOp==Or)
+                flag1OpFlag2 = flag1 || flag2;
+            booleans.push(new Boolean( flag1OpFlag2 ));
+        }
+        //System.out.println(booleans.size());
+        //System.out.println(ops.size());
+        
+        return booleans.pop().booleanValue();
+    }
+    
+    /**
+     * æµ‹è¯•
+     * @param args
+     */
+    public static void main(String[] args) {
+        int n = 1;
+        boolean[] bools = new boolean[n];
+        int[] ops = new int[n-1];
+        for (int j = 0; j < n; j++) {
+            int i = 0;
+            for (i = 0; i < bools.length; i++) {
+                bools[i] = (int) (Math.random() * 2) == 1;
+            }
+            for (i = 0; i < ops.length; i++) {
+                ops[i] = (int) (Math.random() * 2);
+            }
 
-			System.out.print("(");
-			for (i = 0; i < n - 1; i++) {
-				System.out.print(bools[i] + " "
-						+ ((ops[i] == BooleanArrayTest.And) ? "And" : "Or")
-						+ " ");
-			}
-			System.out.print(bools[i] + ")");
+            System.out.print("(");
+            for (i = 0; i < n - 1; i++) {
+                System.out.print(bools[i] + " "
+                        + ((ops[i] == BooleanArrayTest.And) ? "And" : "Or")
+                        + " ");
+            }
+            System.out.print(bools[i] + ")");
 
-			System.out.println("½á¹ûÊÇ:" + testExpressions(bools, ops));
-		}
-	}
-	
+            System.out.println("ç»“æœæ˜¯:" + testExpressions(bools, ops));
+        }
+    }
+    
 }

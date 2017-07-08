@@ -1,4 +1,4 @@
-package iostream;
+package io.data;
 
 
 import java.io.*;

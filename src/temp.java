@@ -2,229 +2,229 @@ import java.io.*;
 import java.security.*;
 
 /**
- * ×Ö·ûµÄÊ®Áù½øÖÆ×ª»»
- * ¹ØÓÚbyte:    signed byte °Ñ 0x00 ~ 0xff
- * Ó³Éä³É·¶Î§ 0~127ºÍ -128~-1    Á½¶Î,±È½Ï¼òµ¥µÄ°ì·¨ÓÃ
- * (b+256)%256µÄ°ì·¨ÁîÆäÖµ»Øµ½0~255£¬»òÕßÓÃ&0xff²¢¸³¸øÒ»¸öint¡£
- * ²Î¿¼http://www.jsfsoft.com:8080/beyond-pebble/pinxue/2006/08/23/1156309692525.html
+ * å­—ç¬¦çš„åå…­è¿›åˆ¶è½¬æ¢
+ * å…³äºbyte:    signed byte æŠŠ 0x00 ~ 0xff
+ * æ˜ å°„æˆèŒƒå›´ 0~127å’Œ -128~-1    ä¸¤æ®µ,æ¯”è¾ƒç®€å•çš„åŠæ³•ç”¨
+ * (b+256)%256çš„åŠæ³•ä»¤å…¶å€¼å›åˆ°0~255ï¼Œæˆ–è€…ç”¨&0xffå¹¶èµ‹ç»™ä¸€ä¸ªintã€‚
+ * å‚è€ƒhttp://www.jsfsoft.com:8080/beyond-pebble/pinxue/2006/08/23/1156309692525.html
  * 
  * @author zhonglijunyi
  * @version 0
  */
 public class temp {
-	
-	public static void main(String[] args) {
-		char ch = (char)-1;
-		byte by = (byte)-2;
-		int char_1 = 0xffff & ch;
-		int byte_2 = 0xff & by;
-		System.out.println("(char)-1:" + char_1 + "\tchar:" + ch +
-				"\nHex:" + Integer.toHexString(char_1));
-		System.out.println("(byte)-2:" + byte_2 + "\tbyte:" + by +
-				"\nHex:" + Integer.toHexString(byte_2));
+    
+    public static void main(String[] args) {
+        char ch = (char)-1;
+        byte by = (byte)-2;
+        int char_1 = 0xffff & ch;
+        int byte_2 = 0xff & by;
+        System.out.println("(char)-1:" + char_1 + "\tchar:" + ch +
+                "\nHex:" + Integer.toHexString(char_1));
+        System.out.println("(byte)-2:" + byte_2 + "\tbyte:" + by +
+                "\nHex:" + Integer.toHexString(byte_2));
 
-		for(int i = 0; i < 0xff; i++){
-			int temp = i << 8;
-			int int_ch = 0xff | temp;
-			char chch = (char)int_ch;
-			System.out.println("int_ch in Hex:" + Integer.toHexString(int_ch)
-					+ "\tchar:" + chch);
-			
-		}
-		
-		System.out.println("MD5Encode(\"H\"):" + bytesToHexString(MD5Encode("H")));
-		System.out.print("str2Bcd(\"123\"):");
-		byte[] sf = str2Bcd("123");
-		for(int i = 0; i < sf.length; i++){
-			System.out.print(sf[i] + "\t");
-		}
-		System.out.println();
-		
-		byte[] bcd = {9,1,25,1};
-		System.out.println(bcd2Str(bcd));
-	}
-	
-	public static byte[] hexStringToByte(String hex) {
-	    int len = (hex.length() / 2);
-	    byte[] result = new byte[len];
-	    char[] achar = hex.toCharArray();
-	    for (int i = 0; i < len; i++) {
-	     int pos = i * 2;
-	     result[i] = (byte) (toByte(achar[pos]) << 4 | toByte(achar[pos + 1]));
-	    }
-	    return result;
-	}
+        for(int i = 0; i < 0xff; i++){
+            int temp = i << 8;
+            int int_ch = 0xff | temp;
+            char chch = (char)int_ch;
+            System.out.println("int_ch in Hex:" + Integer.toHexString(int_ch)
+                    + "\tchar:" + chch);
+            
+        }
+        
+        System.out.println("MD5Encode(\"H\"):" + bytesToHexString(MD5Encode("H")));
+        System.out.print("str2Bcd(\"123\"):");
+        byte[] sf = str2Bcd("123");
+        for(int i = 0; i < sf.length; i++){
+            System.out.print(sf[i] + "\t");
+        }
+        System.out.println();
+        
+        byte[] bcd = {9,1,25,1};
+        System.out.println(bcd2Str(bcd));
+    }
+    
+    public static byte[] hexStringToByte(String hex) {
+        int len = (hex.length() / 2);
+        byte[] result = new byte[len];
+        char[] achar = hex.toCharArray();
+        for (int i = 0; i < len; i++) {
+         int pos = i * 2;
+         result[i] = (byte) (toByte(achar[pos]) << 4 | toByte(achar[pos + 1]));
+        }
+        return result;
+    }
 
-	private static byte toByte(char c) {
-	    byte b = (byte) "0123456789ABCDEF".indexOf(c);
-	    return b;
-	}
+    private static byte toByte(char c) {
+        byte b = (byte) "0123456789ABCDEF".indexOf(c);
+        return b;
+    }
 
-	/** *//**
-	    * °Ñ×Ö½ÚÊı×é×ª»»³É16½øÖÆ×Ö·û´®
-	    * @param bArray
-	    * @return
-	    */
-	public static final String bytesToHexString(byte[] bArray) {
-	    StringBuffer sb = new StringBuffer(bArray.length);
-	    String sTemp;
-	    for (int i = 0; i < bArray.length; i++) {
-	     sTemp = Integer.toHexString(0xFF & bArray[i]);
-	     if (sTemp.length() < 2)
-	      sb.append(0);
-	     sb.append(sTemp.toUpperCase());
-	    }
-	    return sb.toString();
-	}
+    /** *//**
+        * æŠŠå­—èŠ‚æ•°ç»„è½¬æ¢æˆ16è¿›åˆ¶å­—ç¬¦ä¸²
+        * @param bArray
+        * @return
+        */
+    public static final String bytesToHexString(byte[] bArray) {
+        StringBuffer sb = new StringBuffer(bArray.length);
+        String sTemp;
+        for (int i = 0; i < bArray.length; i++) {
+         sTemp = Integer.toHexString(0xFF & bArray[i]);
+         if (sTemp.length() < 2)
+          sb.append(0);
+         sb.append(sTemp.toUpperCase());
+        }
+        return sb.toString();
+    }
 
-	/** *//**
-	    * °Ñ×Ö½ÚÊı×é×ª»»Îª¶ÔÏó
-	    * @param bytes
-	    * @return
-	    * @throws IOException
-	    * @throws ClassNotFoundException
-	    */
-	public static final Object bytesToObject(byte[] bytes) throws IOException, ClassNotFoundException {
-	    ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-	    ObjectInputStream oi = new ObjectInputStream(in);
-	    Object o = oi.readObject();
-	    oi.close();
-	    return o;
-	}
+    /** *//**
+        * æŠŠå­—èŠ‚æ•°ç»„è½¬æ¢ä¸ºå¯¹è±¡
+        * @param bytes
+        * @return
+        * @throws IOException
+        * @throws ClassNotFoundException
+        */
+    public static final Object bytesToObject(byte[] bytes) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        ObjectInputStream oi = new ObjectInputStream(in);
+        Object o = oi.readObject();
+        oi.close();
+        return o;
+    }
 
-	/** *//**
-	    * °Ñ¿ÉĞòÁĞ»¯¶ÔÏó×ª»»³É×Ö½ÚÊı×é
-	    * @param s
-	    * @return
-	    * @throws IOException
-	    */
-	public static final byte[] objectToBytes(Serializable s) throws IOException {
-	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-	    ObjectOutputStream ot = new ObjectOutputStream(out);
-	    ot.writeObject(s);
-	    ot.flush();
-	    ot.close();
-	    return out.toByteArray();
-	}
+    /** *//**
+        * æŠŠå¯åºåˆ—åŒ–å¯¹è±¡è½¬æ¢æˆå­—èŠ‚æ•°ç»„
+        * @param s
+        * @return
+        * @throws IOException
+        */
+    public static final byte[] objectToBytes(Serializable s) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream ot = new ObjectOutputStream(out);
+        ot.writeObject(s);
+        ot.flush();
+        ot.close();
+        return out.toByteArray();
+    }
 
-	public static final String objectToHexString(Serializable s) throws IOException{
-	    return bytesToHexString(objectToBytes(s));
-	}
+    public static final String objectToHexString(Serializable s) throws IOException{
+        return bytesToHexString(objectToBytes(s));
+    }
 
-	public static final Object hexStringToObject(String hex) throws IOException, ClassNotFoundException{
-	    return bytesToObject(hexStringToByte(hex));
-	}
+    public static final Object hexStringToObject(String hex) throws IOException, ClassNotFoundException{
+        return bytesToObject(hexStringToByte(hex));
+    }
 
-	/** *//**
-	    * @º¯Êı¹¦ÄÜ: BCDÂë×ªÎª10½øÖÆ´®(°¢À­²®Êı¾İ)
-	    * @ÊäÈë²ÎÊı: BCDÂë
-	    * @Êä³ö½á¹û: 10½øÖÆ´®
-	    */
-	public static String bcd2Str(byte[] bytes){
-	    StringBuffer temp=new StringBuffer(bytes.length*2);
+    /** *//**
+        * @å‡½æ•°åŠŸèƒ½: BCDç è½¬ä¸º10è¿›åˆ¶ä¸²(é˜¿æ‹‰ä¼¯æ•°æ®)
+        * @è¾“å…¥å‚æ•°: BCDç 
+        * @è¾“å‡ºç»“æœ: 10è¿›åˆ¶ä¸²
+        */
+    public static String bcd2Str(byte[] bytes){
+        StringBuffer temp=new StringBuffer(bytes.length*2);
 
-	    for(int i=0;i<bytes.length;i++){
-	     temp.append((byte)((bytes[i]& 0xf0)>>>4));
-	     temp.append((byte)(bytes[i]& 0x0f));
-	    }
-	    //return temp.toString().substring(0,1).equalsIgnoreCase("0")?temp.toString().substring(1):temp.toString();
-	    return temp.toString();
-	}
+        for(int i=0;i<bytes.length;i++){
+         temp.append((byte)((bytes[i]& 0xf0)>>>4));
+         temp.append((byte)(bytes[i]& 0x0f));
+        }
+        //return temp.toString().substring(0,1).equalsIgnoreCase("0")?temp.toString().substring(1):temp.toString();
+        return temp.toString();
+    }
 
-	/** *//**
-	    * @º¯Êı¹¦ÄÜ: 10½øÖÆ´®×ªÎªBCDÂë
-	    * @ÊäÈë²ÎÊı: 10½øÖÆ´®
-	    * @Êä³ö½á¹û: BCDÂë
-	    */
-	public static byte[] str2Bcd(String asc) {
-	    int len = asc.length();
-	    int mod = len % 2;
+    /** *//**
+        * @å‡½æ•°åŠŸèƒ½: 10è¿›åˆ¶ä¸²è½¬ä¸ºBCDç 
+        * @è¾“å…¥å‚æ•°: 10è¿›åˆ¶ä¸²
+        * @è¾“å‡ºç»“æœ: BCDç 
+        */
+    public static byte[] str2Bcd(String asc) {
+        int len = asc.length();
+        int mod = len % 2;
 
-	    if (mod != 0) {
-	     asc = "0" + asc;
-	     len = asc.length();
-	    }
+        if (mod != 0) {
+         asc = "0" + asc;
+         len = asc.length();
+        }
 
-	    byte abt[] = new byte[len];
-	    if (len >= 2) {
-	     len = len / 2;
-	    }
+        byte abt[] = new byte[len];
+        if (len >= 2) {
+         len = len / 2;
+        }
 
-	    byte bbt[] = new byte[len];
-	    abt = asc.getBytes();
-	    int j, k;
+        byte bbt[] = new byte[len];
+        abt = asc.getBytes();
+        int j, k;
 
-	    for (int p = 0; p < asc.length()/2; p++) {
-	     if ( (abt[2 * p] >= '0') && (abt[2 * p] <= '9')) {
-	      j = abt[2 * p] - '0';
-	     } else if ( (abt[2 * p] >= 'a') && (abt[2 * p] <= 'z')) {
-	      j = abt[2 * p] - 'a' + 0x0a;
-	     } else {
-	      j = abt[2 * p] - 'A' + 0x0a;
-	     }
+        for (int p = 0; p < asc.length()/2; p++) {
+         if ( (abt[2 * p] >= '0') && (abt[2 * p] <= '9')) {
+          j = abt[2 * p] - '0';
+         } else if ( (abt[2 * p] >= 'a') && (abt[2 * p] <= 'z')) {
+          j = abt[2 * p] - 'a' + 0x0a;
+         } else {
+          j = abt[2 * p] - 'A' + 0x0a;
+         }
 
-	     if ( (abt[2 * p + 1] >= '0') && (abt[2 * p + 1] <= '9')) {
-	      k = abt[2 * p + 1] - '0';
-	     } else if ( (abt[2 * p + 1] >= 'a') && (abt[2 * p + 1] <= 'z')) {
-	      k = abt[2 * p + 1] - 'a' + 0x0a;
-	     }else {
-	      k = abt[2 * p + 1] - 'A' + 0x0a;
-	     }
+         if ( (abt[2 * p + 1] >= '0') && (abt[2 * p + 1] <= '9')) {
+          k = abt[2 * p + 1] - '0';
+         } else if ( (abt[2 * p + 1] >= 'a') && (abt[2 * p + 1] <= 'z')) {
+          k = abt[2 * p + 1] - 'a' + 0x0a;
+         }else {
+          k = abt[2 * p + 1] - 'A' + 0x0a;
+         }
 
-	     int a = (j << 4) + k;
-	     byte b = (byte) a;
-	     bbt[p] = b;
-	    }
-	    return bbt;
-	}
-	/** *//**
-	    * @º¯Êı¹¦ÄÜ: BCDÂë×ªASCÂë
-	    * @ÊäÈë²ÎÊı: BCD´®
-	    * @Êä³ö½á¹û: ASCÂë
-	    */
-	/*public static String BCD2ASC(byte[] bytes) {
-	    StringBuffer temp = new StringBuffer(bytes.length * 2);
+         int a = (j << 4) + k;
+         byte b = (byte) a;
+         bbt[p] = b;
+        }
+        return bbt;
+    }
+    /** *//**
+        * @å‡½æ•°åŠŸèƒ½: BCDç è½¬ASCç 
+        * @è¾“å…¥å‚æ•°: BCDä¸²
+        * @è¾“å‡ºç»“æœ: ASCç 
+        */
+    /*public static String BCD2ASC(byte[] bytes) {
+        StringBuffer temp = new StringBuffer(bytes.length * 2);
 
-	    for (int i = 0; i < bytes.length; i++) {
-	     int h = ((bytes[i] & 0xf0) >>> 4);
-	     int l = (bytes[i] & 0x0f);   
-	     temp.append(BToA[h]).append( BToA[l]);
-	    }
-	    return temp.toString() ;
-	}*/
+        for (int i = 0; i < bytes.length; i++) {
+         int h = ((bytes[i] & 0xf0) >>> 4);
+         int l = (bytes[i] & 0x0f);   
+         temp.append(BToA[h]).append( BToA[l]);
+        }
+        return temp.toString() ;
+    }*/
 
-	/** *//**
-	    * MD5¼ÓÃÜ×Ö·û´®£¬·µ»Ø¼ÓÃÜºóµÄ16½øÖÆ×Ö·û´®
-	    * @param origin
-	    * @return
-	    */
-	public static String MD5EncodeToHex(String origin) { 
-	       return bytesToHexString(MD5Encode(origin));
-	     }
+    /** *//**
+        * MD5åŠ å¯†å­—ç¬¦ä¸²ï¼Œè¿”å›åŠ å¯†åçš„16è¿›åˆ¶å­—ç¬¦ä¸²
+        * @param origin
+        * @return
+        */
+    public static String MD5EncodeToHex(String origin) { 
+           return bytesToHexString(MD5Encode(origin));
+         }
 
-	/** *//**
-	    * MD5¼ÓÃÜ×Ö·û´®£¬·µ»Ø¼ÓÃÜºóµÄ×Ö½ÚÊı×é
-	    * @param origin
-	    * @return
-	    */
-	public static byte[] MD5Encode(String origin){
-	    return MD5Encode(origin.getBytes());
-	}
+    /** *//**
+        * MD5åŠ å¯†å­—ç¬¦ä¸²ï¼Œè¿”å›åŠ å¯†åçš„å­—èŠ‚æ•°ç»„
+        * @param origin
+        * @return
+        */
+    public static byte[] MD5Encode(String origin){
+        return MD5Encode(origin.getBytes());
+    }
 
-	/** *//**
-	    * MD5¼ÓÃÜ×Ö½ÚÊı×é£¬·µ»Ø¼ÓÃÜºóµÄ×Ö½ÚÊı×é
-	    * @param bytes
-	    * @return
-	    */
-	public static byte[] MD5Encode(byte[] bytes){
-	    MessageDigest md=null;
-	    try {
-	     md = MessageDigest.getInstance("MD5");
-	     return md.digest(bytes);
-	    } catch (NoSuchAlgorithmException e) {
-	     e.printStackTrace();
-	     return new byte[0];
-	    }
-	  
-	}
+    /** *//**
+        * MD5åŠ å¯†å­—èŠ‚æ•°ç»„ï¼Œè¿”å›åŠ å¯†åçš„å­—èŠ‚æ•°ç»„
+        * @param bytes
+        * @return
+        */
+    public static byte[] MD5Encode(byte[] bytes){
+        MessageDigest md=null;
+        try {
+         md = MessageDigest.getInstance("MD5");
+         return md.digest(bytes);
+        } catch (NoSuchAlgorithmException e) {
+         e.printStackTrace();
+         return new byte[0];
+        }
+      
+    }
 }

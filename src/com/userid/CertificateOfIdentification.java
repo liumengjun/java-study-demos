@@ -3,157 +3,157 @@ package com.userid;
 import java.io.*;
 
 public class CertificateOfIdentification {
-	/*Ğ£ÑéÂë*/
-	private final static byte[] checkCode ={'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'};
-	/*¼ÓÈ¨Òò×Ó*/
-	private final static int[] weightingFactor = {7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
-	
-	/**
-	 * main test app
-	 * @param args
-	 * @throws IOException
-	 */
-	public final static void main(String[] args) throws IOException {
-		
-		/*console input*/
-		BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("ÇëÊäÈëÉí·İÖ¤ºÅ:");
-		String id;
-		boolean flag = true;
-		do {
-			id = inputReader.readLine();
-			if(id==null){
-				System.out.println();
-				System.exit(0);
-			}
-			id = id.trim();
-			if(id.isEmpty()){
-				System.out.println("Ê²Ã´Ò²Ã»ÓĞ£¬ÇëÖØĞÂÊäÈë£º");
-				continue;
-			}
-			byte[] bytes = id.getBytes();
-			if(bytes.length!=15 && bytes.length!=18){
-				System.out.println("ÎŞĞ§µÄ³¤¶È£¬ÇëÖØĞÂÊäÈë£º");
-				continue;
-			}
-			flag = false;
-			for(int i=0;i<bytes.length;i++){
-				if(!(bytes[i]=='X' || bytes[i]=='x') && (bytes[i]<'0' || bytes[i]>'9')){
-					System.out.println("´íÎóµÄ×Ö·û£¬ÇëÖØĞÂÊäÈë£º");
-					flag = true;
-					break;
-				}
-			}
-		} while (flag);
-		/*¼ìÑéÊäÈëµÄÉí·İÖ¤ºÅ*/
-		byte[] correct = verifyID(id);
-		if(correct==null){
-			System.out.println("Éí·İÖ¤ºÅ["+id+"]²»ºÏ·¨!");
-		}else{
-			if(id.length()==15){
-				System.out.println("ÏÖĞĞ18Î»Éí·İÖ¤ºÅ£º"+new String(correct)+"¡£");
-			}else{
-				System.out.println("Éí·İÖ¤ºÅ["+id+"]ºÏ·¨¡£");
-			}
-		}
-	}
+    /*æ ¡éªŒç */
+    private final static byte[] checkCode ={'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'};
+    /*åŠ æƒå› å­*/
+    private final static int[] weightingFactor = {7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
+    
+    /**
+     * main test app
+     * @param args
+     * @throws IOException
+     */
+    public final static void main(String[] args) throws IOException {
+        
+        /*console input*/
+        BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("è¯·è¾“å…¥èº«ä»½è¯å·:");
+        String id;
+        boolean flag = true;
+        do {
+            id = inputReader.readLine();
+            if(id==null){
+                System.out.println();
+                System.exit(0);
+            }
+            id = id.trim();
+            if(id.isEmpty()){
+                System.out.println("ä»€ä¹ˆä¹Ÿæ²¡æœ‰ï¼Œè¯·é‡æ–°è¾“å…¥ï¼š");
+                continue;
+            }
+            byte[] bytes = id.getBytes();
+            if(bytes.length!=15 && bytes.length!=18){
+                System.out.println("æ— æ•ˆçš„é•¿åº¦ï¼Œè¯·é‡æ–°è¾“å…¥ï¼š");
+                continue;
+            }
+            flag = false;
+            for(int i=0;i<bytes.length;i++){
+                if(!(bytes[i]=='X' || bytes[i]=='x') && (bytes[i]<'0' || bytes[i]>'9')){
+                    System.out.println("é”™è¯¯çš„å­—ç¬¦ï¼Œè¯·é‡æ–°è¾“å…¥ï¼š");
+                    flag = true;
+                    break;
+                }
+            }
+        } while (flag);
+        /*æ£€éªŒè¾“å…¥çš„èº«ä»½è¯å·*/
+        byte[] correct = verifyID(id);
+        if(correct==null){
+            System.out.println("èº«ä»½è¯å·["+id+"]ä¸åˆæ³•!");
+        }else{
+            if(id.length()==15){
+                System.out.println("ç°è¡Œ18ä½èº«ä»½è¯å·ï¼š"+new String(correct)+"ã€‚");
+            }else{
+                System.out.println("èº«ä»½è¯å·["+id+"]åˆæ³•ã€‚");
+            }
+        }
+    }
 
-	/**
-	 * ÑéÖ¤ÊäÈëµÄÉí·İÖ¤ºÅÂëid
-	 * @param id
-	 * @return
-	 */
-	public static byte[] verifyID(String id) {
-		byte[] bytes = id.getBytes();
-		/*¼ì²éÎŞĞ§µÄ³¤¶È*/
-		int id_len = bytes.length;
-		if(id_len!=15 && id_len!=18){
-			return null;
-		}
+    /**
+     * éªŒè¯è¾“å…¥çš„èº«ä»½è¯å·ç id
+     * @param id
+     * @return
+     */
+    public static byte[] verifyID(String id) {
+        byte[] bytes = id.getBytes();
+        /*æ£€æŸ¥æ— æ•ˆçš„é•¿åº¦*/
+        int id_len = bytes.length;
+        if(id_len!=15 && id_len!=18){
+            return null;
+        }
 
-		/*¼ì²é´íÎóµÄ×Ö·û*/
-		boolean error = false;
-		if(id_len==15){//³¤¶ÈÎª15Î»Ê±£¬¾É°æ±¾£¬´ó¶àÒÑ²»ÓÃ
-			for(int i=0;i<id_len;i++){
-				if(bytes[i]<'0' || bytes[i]>'9'){
-					error = true;
-					break;
-				}
-			}
-			if(!error){
-				byte[] temp = new byte[18];
-				int i=0,j=0;
-				for(;i<6;i++,j++) temp[j]=bytes[i];
-				temp[j++]='1';temp[j++]='9';
-				for(;i<15;i++,j++) temp[j]=bytes[i];
-				bytes = null;
-				bytes = temp;
-			}
-		}
-		if(id_len==18){//³¤¶ÈÎª18Î»
-			for(int i=0;i<id_len-1;i++){
-				if(bytes[i]<'0' || bytes[i]>'9'){
-					error = true;
-					break;
-				}
-			}
-			if(!(bytes[17]=='X' || bytes[17]=='x') && (bytes[17]<'0' || bytes[17]>'9')){
-				error = true;
-			}
-		}
-		if(error){
-			return null;
-		}
-		
-		/*ÌáÈ¡ºÅÂëÊı×Ö*/
-		int[] ai = new int[17];
-		for(int i=0;i<17;i++) ai[i] = bytes[i]-'0';
-		
-		/*System.out.println("a[1,2...17]:");
-		for(int i=0;i<17;i++){
-			System.out.print(ai[i]+" ");
-		}
-		System.out.println();
-		System.out.println("W[1,2...17]:");
-		for(int i=0;i<17;i++){
-			System.out.print(weightingFactor[i]+" ");
-		}
-		System.out.println();*/	
-		
-		/*
-		 * ¶ÔÇ°17Î»Êı×Ö±¾ÌåÂë¼ÓÈ¨ÇóºÍ
-		 * ¹«Ê½Îª£ºS = Sum(Ai * Wi), i = 0, ... , 16
-		 */
-		int sum = 0;
-		for(int i=0;i<17;i++){
-			sum += ai[i]*weightingFactor[i];
-		}
+        /*æ£€æŸ¥é”™è¯¯çš„å­—ç¬¦*/
+        boolean error = false;
+        if(id_len==15){//é•¿åº¦ä¸º15ä½æ—¶ï¼Œæ—§ç‰ˆæœ¬ï¼Œå¤§å¤šå·²ä¸ç”¨
+            for(int i=0;i<id_len;i++){
+                if(bytes[i]<'0' || bytes[i]>'9'){
+                    error = true;
+                    break;
+                }
+            }
+            if(!error){
+                byte[] temp = new byte[18];
+                int i=0,j=0;
+                for(;i<6;i++,j++) temp[j]=bytes[i];
+                temp[j++]='1';temp[j++]='9';
+                for(;i<15;i++,j++) temp[j]=bytes[i];
+                bytes = null;
+                bytes = temp;
+            }
+        }
+        if(id_len==18){//é•¿åº¦ä¸º18ä½
+            for(int i=0;i<id_len-1;i++){
+                if(bytes[i]<'0' || bytes[i]>'9'){
+                    error = true;
+                    break;
+                }
+            }
+            if(!(bytes[17]=='X' || bytes[17]=='x') && (bytes[17]<'0' || bytes[17]>'9')){
+                error = true;
+            }
+        }
+        if(error){
+            return null;
+        }
+        
+        /*æå–å·ç æ•°å­—*/
+        int[] ai = new int[17];
+        for(int i=0;i<17;i++) ai[i] = bytes[i]-'0';
+        
+        /*System.out.println("a[1,2...17]:");
+        for(int i=0;i<17;i++){
+            System.out.print(ai[i]+" ");
+        }
+        System.out.println();
+        System.out.println("W[1,2...17]:");
+        for(int i=0;i<17;i++){
+            System.out.print(weightingFactor[i]+" ");
+        }
+        System.out.println();*/ 
+        
+        /*
+         * å¯¹å‰17ä½æ•°å­—æœ¬ä½“ç åŠ æƒæ±‚å’Œ
+         * å…¬å¼ä¸ºï¼šS = Sum(Ai * Wi), i = 0, ... , 16
+         */
+        int sum = 0;
+        for(int i=0;i<17;i++){
+            sum += ai[i]*weightingFactor[i];
+        }
 
-		/*System.out.println("S=¡Æ(ai¡ÁWi)");
-		System.out.println("S="+sum);*/
-		/*
-		 * ÒÔ11¶Ô¼ÆËã½á¹ûÈ¡Ä£
-		 * Y = mod(S, 11)
-		 */
-		int y = sum%11;
-		/*System.out.println("Y=S(mod 11)");
-		System.out.println("Y="+y);*/
-		
-		byte check_code = checkCode[y];
-		/*System.out.println("Ğ£ÑéÂë=(12-Y)(mod 11){×¢:10=X}");
-		System.out.println("Ğ£ÑéÂë:"+(char)check_code);*/
-		if(id_len==15){
-			bytes[17] = check_code;
-		}
-		if(id_len==18){
-			if(bytes[17]=='x'){
-				bytes[17]='X';
-			}
-			if(check_code!=bytes[17]){
-				return null;
-			}
-		}
-		
-		return bytes;
-	}
+        /*System.out.println("S=âˆ‘(aiÃ—Wi)");
+        System.out.println("S="+sum);*/
+        /*
+         * ä»¥11å¯¹è®¡ç®—ç»“æœå–æ¨¡
+         * Y = mod(S, 11)
+         */
+        int y = sum%11;
+        /*System.out.println("Y=S(mod 11)");
+        System.out.println("Y="+y);*/
+        
+        byte check_code = checkCode[y];
+        /*System.out.println("æ ¡éªŒç =(12-Y)(mod 11){æ³¨:10=X}");
+        System.out.println("æ ¡éªŒç :"+(char)check_code);*/
+        if(id_len==15){
+            bytes[17] = check_code;
+        }
+        if(id_len==18){
+            if(bytes[17]=='x'){
+                bytes[17]='X';
+            }
+            if(check_code!=bytes[17]){
+                return null;
+            }
+        }
+        
+        return bytes;
+    }
 }
