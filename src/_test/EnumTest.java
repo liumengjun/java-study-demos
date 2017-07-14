@@ -29,5 +29,8 @@ enum EnumTest {
 
 		EnumTest direct = EnumTest.LIU;
 		System.out.println(direct);
+    System.out.println("LIU".equals(EnumTest.LIU));
+    System.out.println("LIU".equals(EnumTest.LIU.name()));
+    System.out.println("LIU".equals(EnumTest.LIU.toString()));
 	}
 }
