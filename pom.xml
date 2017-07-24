@@ -36,6 +36,7 @@
 
     <properties>
         <httpclient-version>4.5.3</httpclient-version>
+        <google-cloud-version>0.20.3-alpha</google-cloud-version>
     </properties>
 
     <dependencyManagement>
@@ -101,6 +102,12 @@
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-dynamodb</artifactId>
+        </dependency>
+        <!--google-cloud-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud</artifactId>
+            <version>${google-cloud-version}</version>
         </dependency>
     </dependencies>
 </project>
