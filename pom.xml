@@ -109,5 +109,11 @@
             <artifactId>google-cloud</artifactId>
             <version>${google-cloud-version}</version>
         </dependency>
+        <!--cron-utils-->
+        <dependency>
+            <groupId>com.cronutils</groupId>
+            <artifactId>cron-utils</artifactId>
+            <version>6.0.2</version>
+        </dependency>
     </dependencies>
 </project>
