@@ -109,6 +109,11 @@
             <artifactId>google-cloud</artifactId>
             <version>${google-cloud-version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>23.0</version>
+        </dependency>
         <!--cron-utils-->
         <dependency>
             <groupId>com.cronutils</groupId>
