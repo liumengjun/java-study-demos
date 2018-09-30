@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class FSsWriteBenchmark {
 
-    private static final int TEST_SIZE = 10 * 1024 * 1024;
+    protected static int TEST_SIZE = 10 * 1024 * 1024;
 
     private static Random random = ThreadLocalRandom.current();
 
