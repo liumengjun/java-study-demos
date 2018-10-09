@@ -25,6 +25,7 @@ public class OpenSSHRSAKeyReader {
         RSAPublicKey publicKey = readSSHRSAPublicKey(rsaPublicKeyText);
         assert privateKey.getModulus().equals(publicKey.getModulus());
         System.out.println(privateKey);
+        System.out.println(privateKey.getModulus());
         System.out.println(publicKey);
 
         String home = System.getProperty("user.home");
@@ -32,6 +33,7 @@ public class OpenSSHRSAKeyReader {
         publicKey = readSSHRSAPublicKey(new File(home + "/.ssh/id_rsa.pub"));
         assert privateKey.getModulus().equals(publicKey.getModulus());
         System.out.println(privateKey);
+        System.out.println(privateKey.getModulus());
         System.out.println(publicKey);
     }
 
@@ -46,7 +48,7 @@ public class OpenSSHRSAKeyReader {
 
     /**
      * 读取ssh-keygen生成的私钥(from file text)
-     * 格式RSA Private Key file (PKCS#1)
+     * 格式RSA Private Key file (PKCS#1), 参考 rfc8017#appendix-A.1.2
      */
     public static RSAPrivateKey readSSHRSAPrivateKey(@Nonnull String rsaPrivateKeyText)
             throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
@@ -64,7 +66,7 @@ public class OpenSSHRSAKeyReader {
 
     /**
      * 读取ssh-keygen生成的私钥(from body)
-     * 格式RSA Private Key file (PKCS#1)
+     * 格式RSA Private Key file (PKCS#1), 参考 rfc8017#appendix-A.1.2
      */
     public static RSAPrivateKey readSSHRSAPrivateKeyBody(@Nonnull String rsaPrivateKeyBody)
             throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
@@ -75,8 +77,7 @@ public class OpenSSHRSAKeyReader {
         // 密钥不含 otherPrimeInfos 信息，故只有 9 段
         DerValue[] ders = dis.getSequence(9);
         // 依次读取 RSA 因子信息
-        int version = ders[0].getBigInteger().intValue();
-        // assert version == 0x30;
+        // int version = ders[0].getBigInteger().intValue(); // it's 0, ignore
         BigInteger modulus = ders[1].getBigInteger();
         BigInteger publicExponent = ders[2].getBigInteger();
         BigInteger privateExponent = ders[3].getBigInteger();
