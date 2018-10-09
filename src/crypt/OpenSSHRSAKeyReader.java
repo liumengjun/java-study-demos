@@ -1,5 +1,11 @@
 package crypt;
 
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 
@@ -7,10 +13,7 @@ import javax.annotation.Nonnull;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -27,6 +30,7 @@ public class OpenSSHRSAKeyReader {
         System.out.println(privateKey);
         System.out.println(privateKey.getModulus());
         System.out.println(publicKey);
+        System.out.println();
 
         String home = System.getProperty("user.home");
         privateKey = readSSHRSAPrivateKey(new File(home + "/.ssh/id_rsa"));
@@ -35,6 +39,49 @@ public class OpenSSHRSAKeyReader {
         System.out.println(privateKey);
         System.out.println(privateKey.getModulus());
         System.out.println(publicKey);
+        System.out.println();
+
+        // read private key by BC
+        privateKey = (RSAPrivateKey) readPrivateKeyByBC(home + "/.ssh/id_rsa", RSAPrivateKey.class);
+        System.out.println(privateKey.getModulus());
+        System.out.println(privateKey.getModulus().equals(publicKey.getModulus()));
+    }
+
+    private static PrivateKey readPrivateKeyByBC(
+            String fileName,
+            Class expectedPrivKeyClass)
+            throws IOException {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        return decryptKeyByBC(fileName, expectedPrivKeyClass, new JcePEMDecryptorProviderBuilder().setProvider("BC").build("changeit".toCharArray()));
+        // return decryptKeyByBC(fileName, expectedPrivKeyClass, new BcPEMDecryptorProvider("changeit".toCharArray()));
+    }
+
+    private static PrivateKey decryptKeyByBC(String fileName, Class expectedPrivKeyClass, PEMDecryptorProvider decProv)
+            throws IOException {
+        PEMParser pr = openPEMResource(fileName);
+        Object o = pr.readObject();
+
+        if (o == null || !((o instanceof PEMKeyPair) || (o instanceof PEMEncryptedKeyPair))) {
+            throw new IOException("Didn't find OpenSSL key");
+        }
+
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+        KeyPair kp = (o instanceof PEMEncryptedKeyPair) ?
+                converter.getKeyPair(((PEMEncryptedKeyPair) o).decryptKeyPair(decProv)) :
+                converter.getKeyPair((PEMKeyPair) o);
+
+        PrivateKey privKey = kp.getPrivate();
+
+        if (!expectedPrivKeyClass.isInstance(privKey)) {
+            throw new IOException("Returned key not of correct type");
+        }
+        return privKey;
+    }
+
+    private static PEMParser openPEMResource(String fileName) throws FileNotFoundException {
+        InputStream res = new FileInputStream(fileName);
+        Reader fRd = new BufferedReader(new InputStreamReader(res));
+        return new PEMParser(fRd);
     }
 
     /**
