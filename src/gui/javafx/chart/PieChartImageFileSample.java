@@ -1,0 +1,64 @@
+package gui.javafx.chart;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+
+import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
+import javafx.scene.image.WritableImage;
+import javafx.stage.Stage;
+
+public class PieChartImageFileSample extends Application {
+
+    @Override
+    public void start(Stage stage) {
+        Scene scene = new Scene(new Group());
+        stage.setTitle("Imported Fruits");
+        stage.setWidth(500);
+        stage.setHeight(500);
+
+        ObservableList<PieChart.Data> pieChartData =
+            FXCollections.observableArrayList(
+                new PieChart.Data("Grapefruit", 13),
+                new PieChart.Data("Oranges", 25),
+                new PieChart.Data("Plums", 10),
+                new PieChart.Data("Pears", 22),
+                new PieChart.Data("Apples", 30));
+        final PieChart chart = new PieChart(pieChartData);
+        chart.setTitle("Imported Fruits");
+
+        ((Group) scene.getRoot()).getChildren().add(chart);
+
+        saveAsPng(scene);
+        System.out.println("Done!");
+        System.exit(0);
+        //stage.setScene(scene);
+        //stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    static void saveAsPng(Scene scene) {
+        try {
+            WritableImage image = scene.snapshot(null);
+
+            File file = new File("temp/pieChart.png");
+
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+        } catch (IOException ex) {
+            Logger.getLogger(PieChartSample.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+}
