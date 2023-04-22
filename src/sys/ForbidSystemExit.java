@@ -9,6 +9,8 @@ public class ForbidSystemExit {
     private static class ExitTrappedException extends SecurityException {
     }
 
+    private static boolean forbidden = false;
+
     private static void forbidSystemExitCall() {
         final SecurityManager securityManager = new SecurityManager() {
             @Override
@@ -22,12 +24,21 @@ public class ForbidSystemExit {
                     System.out.println(-2);
                     throw new AccessControlException("can't change accessible");
                 }
+                if (permission.getName().equals("setSecurityManager")) {
+                    System.out.println(-3);
+                    if (forbidden) {
+                        System.out.println(-4);
+                        throw new AccessControlException("can't replace security manager");
+                    }
+                }
             }
         };
+        forbidden = true;
         System.setSecurityManager(securityManager);
     }
 
     private static void enableSystemExitCall() {
+        forbidden = false;
         System.setSecurityManager(null);
     }
 
@@ -38,6 +49,7 @@ public class ForbidSystemExit {
     public static void main(String[] args) throws ClassNotFoundException, InvocationTargetException, IllegalAccessException {
         System.out.println(1);
 //        System.exit(0);
+//        System.setSecurityManager(null);
         Class sc = Class.forName("java.lang.Shutdown");
         Method[] ms = sc.getDeclaredMethods();
         for (Method m : ms) {
