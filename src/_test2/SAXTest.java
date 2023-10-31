@@ -1,3 +1,5 @@
+package _test2;
+
 import java.io.*;
 import java.net.*;
 import javax.xml.parsers.*;
@@ -7,7 +9,7 @@ import org.xml.sax.helpers.*;
 /**
    This program demonstrates how to use a SAX parser. The
    program prints all hyperlinks links of an XHTML web page.
-   Usage: java SAXTest url
+   Usage: java _test2.SAXTest url
 */
 public class SAXTest
 {

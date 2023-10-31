@@ -1,3 +1,4 @@
+package _test;
 
 public class StringArrayTest {
 	public static void main(String[] args) {

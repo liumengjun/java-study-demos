@@ -1,3 +1,5 @@
+package _test2;
+
 public class JosephTest {
 
 	private static long startTime;
