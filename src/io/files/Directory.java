@@ -9,7 +9,7 @@ public class Directory {
         /**
          * 目录判断
          */
-        File curDir = new File("./student");
+        File curDir = new File("./var/temp/student");
         boolean isDirectory;
         isDirectory = curDir.isDirectory();
         System.out.println("isDirectory:"+isDirectory);
