@@ -1,7 +1,6 @@
-package exercise;
+package algorism._exercise;
 
 import java.util.HashSet;
-import java.util.Scanner;
 import java.util.Set;
 
 /**

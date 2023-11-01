@@ -1,4 +1,4 @@
-package algorism;
+package algorism.math;
 /**
  * 全排列
  * @author zhonglijunyi<br>

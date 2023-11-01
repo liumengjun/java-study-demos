@@ -1,7 +1,6 @@
-package exercise;
+package algorism._exercise;
 
 import java.util.Arrays;
-import java.util.Scanner;
 
 /**
  * 建一个学校，使到各个家庭距离之和最短

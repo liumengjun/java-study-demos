@@ -1,4 +1,4 @@
-package exercise;
+package algorism._exercise;
 
 /**
  * 找到子数组其和等于目标值

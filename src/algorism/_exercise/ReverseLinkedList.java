@@ -1,4 +1,4 @@
-package exercise;
+package algorism._exercise;
 
 /**
  * 区间(或全部)反转单向链表
