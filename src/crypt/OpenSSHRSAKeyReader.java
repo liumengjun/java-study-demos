@@ -6,6 +6,10 @@ import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
+/**
+ * 如果使用 java8以上版本(>jdk1.8), 那么在编译时需要加下面参数
+ * --add-exports java.base/sun.security.util=ALL-UNNAMED
+ */
 import sun.security.util.DerInputStream;
 import sun.security.util.DerValue;
 

@@ -191,6 +191,17 @@
             <artifactId>redisson</artifactId>
             <version>3.20.1</version>
         </dependency>
+<!--        jdk 11+使用 openjfx-->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>11.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>11.0.2</version>
+        </dependency>
     </dependencies>
 
     <repositories>

@@ -1,14 +1,12 @@
 package crypt;
 
 import java.security.MessageDigest;
+import java.util.Base64;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 /**
  * 基础加密组件
@@ -23,12 +21,12 @@ public abstract class Coder {
 
 	/**
 	 * MAC算法可选以下多种算法
-	 * 
+	 *
 	 * <pre>
-	 * HmacMD5 
-	 * HmacSHA1 
-	 * HmacSHA256 
-	 * HmacSHA384 
+	 * HmacMD5
+	 * HmacSHA1
+	 * HmacSHA256
+	 * HmacSHA384
 	 * HmacSHA512
 	 * </pre>
 	 */
@@ -36,29 +34,29 @@ public abstract class Coder {
 
 	/**
 	 * BASE64解密
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 * @throws Exception
 	 */
 	public static byte[] decryptBASE64(String key) throws Exception {
-		return (new BASE64Decoder()).decodeBuffer(key);
+		return Base64.getDecoder().decode(key.getBytes());
 	}
 
 	/**
 	 * BASE64加密
-	 * 
+	 *
 	 * @param key
 	 * @return
 	 * @throws Exception
 	 */
 	public static String encryptBASE64(byte[] key) throws Exception {
-		return (new BASE64Encoder()).encodeBuffer(key);
+		return new String(Base64.getEncoder().encode(key));
 	}
 
 	/**
 	 * MD5加密
-	 * 
+	 *
 	 * @param data
 	 * @return
 	 * @throws Exception
@@ -74,7 +72,7 @@ public abstract class Coder {
 
 	/**
 	 * SHA加密
-	 * 
+	 *
 	 * @param data
 	 * @return
 	 * @throws Exception
@@ -90,7 +88,7 @@ public abstract class Coder {
 
 	/**
 	 * 初始化HMAC密钥
-	 * 
+	 *
 	 * @return
 	 * @throws Exception
 	 */
@@ -103,7 +101,7 @@ public abstract class Coder {
 
 	/**
 	 * HMAC加密
-	 * 
+	 *
 	 * @param data
 	 * @param key
 	 * @return

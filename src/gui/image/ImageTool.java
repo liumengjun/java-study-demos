@@ -20,6 +20,10 @@ import javax.imageio.stream.ImageInputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+/**
+ * 如果使用 java8以上版本(>jdk1.8), 那么在编译时需要加下面参数
+ * --add-exports java.desktop/sun.awt.image=ALL-UNNAMED
+ */
 import sun.awt.image.ToolkitImage;
 
 public class ImageTool {

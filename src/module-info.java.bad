@@ -1,0 +1,49 @@
+/**
+ * 废弃，使用未命名模式
+ --add-exports java.base/sun.security.util=ALL-UNNAMED
+ --add-exports java.base/jdk.internal.misc=ALL-UNNAMED
+ --add-exports java.desktop/sun.awt.image=ALL-UNNAMED
+ --add-exports java.desktop/com.sun.media.sound=ALL-UNNAMED
+ */
+//module study.demos {
+////    requires java.base;  // 默认
+//    requires java.desktop;
+//    requires java.sql;
+//    requires java.scripting;
+//    requires java.compiler;
+////    --add-exports java.base/sun.security.util=study.demos
+////    --add-exports java.base/jdk.internal.misc=study.demos
+////    --add-exports java.desktop/sun.awt.image=study.demos
+////    --add-exports java.desktop/com.sun.media.sound=study.demos
+//    requires javafx.controls;
+//    requires javafx.swing;
+//    requires junit;
+//    requires org.bouncycastle.pkix;
+//    requires org.bouncycastle.provider;
+//    requires jsr305;
+//    requires commons.io;
+//    requires commons.lang;
+//    requires commons.pool2;
+//    requires org.apache.commons.lang3;
+//    requires selenium.api;
+//    requires selenium.chrome.driver;
+//    requires selenium.support;
+//    requires fastjson;
+//    requires gson;
+//    requires org.apache.httpcomponents.httpcore;
+//    requires org.apache.httpcomponents.httpmime;
+//    requires org.apache.httpcomponents.httpclient;
+//    requires hadoop.common;
+//    requires com.google.common;
+//    requires redisson;
+//    requires org.mongodb.bson;
+//    requires org.mongodb.driver.sync.client;
+//    /**
+//     * 错误: 模块同时从 aws.java.sdk.core 和 aws.java.sdk.s3 读取程序包 com.amazonaws.auth
+//     * aws.java.sdk.core 和 aws.java.sdk.s3 都有 com.amazonaws.auth, build 失败解决不了
+//     */
+//    requires aws.java.sdk.core;
+//    requires aws.java.sdk.s3;
+//    requires cron.utils;
+//    requires threetenbp;
+//}

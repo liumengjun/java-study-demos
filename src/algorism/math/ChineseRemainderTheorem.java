@@ -22,7 +22,7 @@ public class ChineseRemainderTheorem {
 		}
 		// M[k]*y[k]≡1(mod m[k])
 		for(int k=0; k<N; k++) {
-			for (int _=M[k]/m[k], t=(1>_?1:_);true;t++) {
+			for (int __=M[k]/m[k], t=(1>__?1:__);true;t++) {
 				int p = t*m[k]+1;
 				if (p%M[k]==0) {
 					y[k]=p/M[k];

@@ -4,12 +4,13 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
 
-import sun.security.rsa.RSAPrivateCrtKeyImpl;
+//import sun.security.rsa.RSAPrivateCrtKeyImpl;
 
 /** */
 /**
@@ -34,7 +35,7 @@ public class RSAEncrypt {
 			KeyPair keyPair = keyPairGen.generateKeyPair();
 			// Generate keys
 			RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
-			RSAPrivateCrtKeyImpl pcki = (RSAPrivateCrtKeyImpl) privateKey;
+			RSAPrivateCrtKey pcki = (RSAPrivateCrtKey) privateKey;
 			System.out.println(privateKey);
 			
 			BigInteger p = pcki.getPrimeP();

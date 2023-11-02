@@ -55,7 +55,7 @@ public class CoderTest {
 		BigInteger sha = new BigInteger(Coder.encryptSHA(inputData));
 		System.err.println("SHA:\n" + sha.toString(32));
 
-		BigInteger mac = new BigInteger(Coder.encryptHMAC(inputData, inputStr));
+		BigInteger mac = new BigInteger(Coder.encryptHMAC(inputData, key));
 		System.err.println("HMAC:\n" + mac.toString(16));
 	}
 }
