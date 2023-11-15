@@ -1,5 +1,7 @@
 package algorism._exercise;
 
+import algorism.util.Holder;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -40,16 +42,79 @@ import java.util.Deque;
  */
 public class DecodeKRepeatString {
     public static void main(String[] args) {
-        String s = "3[a]2[bc]";
-        System.out.println(decode(s));  // aaabcbc
-        s = "3[a2[c]]";
-        System.out.println(decode(s));  // accaccacc
-        s = "2[abc]3[cd]ef";
-        System.out.println(decode(s));  // abcabccdcdcdef
-        System.out.println(decode("abcd"));
-        System.out.println(decode("a2[bc]d"));
-        System.out.println(decode("a3[b2[cd]]"));
-        System.out.println(decode("a3[2[bc]d]")); // bad, fail
+//        String s = "3[a]2[bc]";
+//        System.out.println(decode(s));  // aaabcbc
+//        s = "3[a2[c]]";
+//        System.out.println(decode(s));  // accaccacc
+//        s = "2[abc]3[cd]ef";
+//        System.out.println(decode(s));  // abcabccdcdcdef
+//        System.out.println(decode("abcd"));
+//        System.out.println(decode("a2[bc]d"));
+//        System.out.println(decode("a3[b2[cd]]"));
+//        System.out.println(decode("a3[2[bc]d]")); // bad, fail
+//        System.out.println(decode("a2[b3[c]d2[ef]g]hi")); // bad, fail
+
+        System.out.println(decodeExt("3[a]2[bc]"));  // aaabcbc
+        System.out.println(decodeExt("3[a2[c]]"));  // accaccacc
+        System.out.println(decodeExt("2[abc]3[cd]ef"));  // abcabccdcdcdef
+        System.out.println(decodeExt("abcd"));  // abcd
+        System.out.println(decodeExt("a2[bc]d"));  // abcbcd
+        System.out.println(decodeExt("a3[b2[cd]]"));  // abcdcdbcdcdbcdcd
+        System.out.println(decodeExt("a3[2[bc]d]"));  // abcbcdbcbcdbcbcd
+        System.out.println(decodeExt("a2[b3[c]d2[ef]g]hi"));  // abcccdefefgbcccdefefghi
+        System.out.println(decodeExt("a2[你好],3[😄]hi！\\1\\2\\3 3[go！]"));
+    }
+
+    public static String decodeExt(String s) {
+        // 相当于解析`1[s]`
+//        AtomicInteger pos = new AtomicInteger();  // 借用AtomicInteger作为int值holder
+//        int[] pos = new int[1];  // 借用一元素数组作为int值holder，但是不美观
+        Holder<Integer> pos = new Holder<>(0);
+        // 使用holder，防止递归后值无法跟进。Java8有`javax.xml.ws.Holder`但是包太那啥
+        return decodeExtOne(pos, s);
+    }
+
+    private static String decodeExtOne(Holder<Integer> pos, String s) {
+        StringBuilder result = new StringBuilder();
+        while (pos.value < s.length()) {
+            // 解析字母串，可能不是
+            char c = s.charAt(pos.value);
+            while ((c != '[') && (c != ']') && !Character.isDigit(c)) {
+                if (c == '\\') {
+                    // 增加转义字符处理，本没这要求可不要
+                    pos.value++;
+                    c = s.charAt(pos.value);
+                }
+                result.append(c);
+                pos.value++;
+                if (pos.value >= s.length()) {
+                    break;
+                }
+                c = s.charAt(pos.value);
+            }
+            if (pos.value >= s.length() || c == ']') {
+                // 这段结束了。字符后面可能没有k
+                break;
+            }
+            // 解析数字k, 可是多位数
+            StringBuilder kStr = new StringBuilder();
+            while (Character.isDigit(c)) {
+                kStr.append(c);
+                pos.value++;
+                c = s.charAt(pos.value);
+            }
+            int k = Integer.parseInt(kStr.toString());
+            // 现在c应该是'[', 准备递归解析
+            pos.value++;
+            String item = decodeExtOne(pos, s);
+            // 拼接多次item
+            for (int i = 0; i < k; i++) {
+                result.append(item);
+            }
+            // 现在s.charAt(pos)应该是']', 然后下一步
+            pos.value++;
+        }
+        return result.toString();
     }
 
     public static String decode(String s) {
@@ -78,7 +143,7 @@ public class DecodeKRepeatString {
         return resultBuf.toString();
     }
 
-    public static String decodeSeg(Deque stack, String suffix) {
+    private static String decodeSeg(Deque stack, String suffix) {
         // 解析[]中的 encoded_string 记为 item
         StringBuilder itemBuf = new StringBuilder();
         while (!stack.isEmpty()) {
