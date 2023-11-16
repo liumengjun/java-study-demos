@@ -62,7 +62,7 @@ public class DecodeKRepeatString {
         System.out.println(decodeExt("a3[b2[cd]]"));  // abcdcdbcdcdbcdcd
         System.out.println(decodeExt("a3[2[bc]d]"));  // abcbcdbcbcdbcbcd
         System.out.println(decodeExt("a2[b3[c]d2[ef]g]hi"));  // abcccdefefgbcccdefefghi
-        System.out.println(decodeExt("a2[你好],3[😄]hi！\\1\\2\\3 3[go！]"));
+        System.out.println(decodeExt("a2[\u0661\u0968\uFF13你好],3[😄]hi！\\1\\2\\3 3[go！]"));
     }
 
     public static String decodeExt(String s) {
@@ -79,7 +79,7 @@ public class DecodeKRepeatString {
         while (pos.value < s.length()) {
             // 解析字母串，可能不是
             char c = s.charAt(pos.value);
-            while ((c != '[') && (c != ']') && !Character.isDigit(c)) {
+            while ((c != '[') && (c != ']') && !isDigit(c)) {
                 if (c == '\\') {
                     // 增加转义字符处理，本没这要求可不要
                     pos.value++;
@@ -98,7 +98,7 @@ public class DecodeKRepeatString {
             }
             // 解析数字k, 可是多位数
             StringBuilder kStr = new StringBuilder();
-            while (Character.isDigit(c)) {
+            while (isDigit(c)) {
                 kStr.append(c);
                 pos.value++;
                 c = s.charAt(pos.value);
@@ -115,6 +115,10 @@ public class DecodeKRepeatString {
             pos.value++;
         }
         return result.toString();
+    }
+
+    private static boolean isDigit(char c) {
+        return c >= '0' && c <= '9';
     }
 
     public static String decode(String s) {
@@ -166,7 +170,7 @@ public class DecodeKRepeatString {
         StringBuilder kBuf = new StringBuilder();
         while (!stack.isEmpty()) {
             char c = (char) stack.peek();
-            if (Character.isDigit(c)) {
+            if (isDigit(c)) {
                 kBuf.append(stack.pop());
             } else {
                 break;
