@@ -1,0 +1,49 @@
+#!/usr/bin/java --source 21
+// "Shebang" files: from jdk11
+// see also: https://openjdk.org/projects/jdk/
+
+import java.util.ArrayList;
+
+public class Hello {
+    public static void main(String[] args) {
+        // var: from jdk10
+        var list = new ArrayList<>();
+        var hi = "hello world";
+        var bool = true;
+        var i = 1;
+        var p = new Point(200, 300);
+        list.add(hi);
+        list.add(bool);
+        list.add(i + i);
+        list.add(1.23);
+        list.add(Color.RED);
+        list.add(p);
+        list.add("End");
+        System.out.println(list);
+        for (var obj : list) {
+            patternSwitchTest(obj);
+        }
+    }
+
+    // As of Java 21
+    static void patternSwitchTest(Object obj) {
+        String formatted = switch (obj) {
+            case Boolean b -> String.format("boolean: %b", b);
+            case Integer i -> String.format("int: %d", i);
+            case Long l -> String.format("long: %d", l);
+            case Double d -> String.format("double: %f", d);
+            case String s -> String.format("String: %s", s);
+            case Color c -> "Color: " + c.toString();
+            case Point p -> "Record class: " + p.toString();
+            default -> obj.toString();
+        };
+        System.out.println(formatted);
+    }
+
+
+    // record: from jdk16
+    record Point(int x, int y) {
+    }
+
+    enum Color {RED, GREEN, BLUE;}
+}
