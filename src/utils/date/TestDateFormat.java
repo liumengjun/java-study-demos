@@ -46,15 +46,15 @@ public class TestDateFormat{
         System.out.println(s);
         
         /** 输出格式: 2006-01-01 00:00:00 */
-        DateFormat format1 = new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        DateFormat format1 = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         s = format1.format(new Date());
         System.out.println(s);
         
         /** 输出格式: 2006-01-01 00:00:00 */
-        System.out.println((new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss")).format(new Date()));
+        System.out.println((new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()));
         
         /** 输出格式: 20060101000000***/
-        DateFormat format2 = new java.text.SimpleDateFormat("yyyyMMddhhmmss");
+        DateFormat format2 = new java.text.SimpleDateFormat("yyyyMMddHHmmss");
         s = format2.format(new Date());
         System.out.println(s); 
         
