@@ -1,4 +1,4 @@
-package benchmark;  // 使用`jmh`必须有包
+package basic;  // 使用`jmh`必须有包
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 /**
  * 探索循环展开带来的性能提升
  * <p>按照一定的步数跳跃，每次循环处理多个对象，循环次数减少了，循环也变胖了。
- * <p>总数据量很大时，如果循环体内计算简单，性能提升显著，如果循环体很复杂，几乎没有提升。总数据量较小时，如果计算很简单也没有提升，减少的循环次数不明显，而且程序更复杂了。
+ * <p>如果循环体内计算简单，性能提升显著，如果循环体越复杂，提升越弱。
  * <p>对比多线程处理，循环体内计算越复杂，用多线程性能提升越明显。如果计算很简单，只有数据量很大时才需要用多线程。
  * <pre>
  * 相关参数(都不启用)
@@ -21,7 +21,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  * -XX:+UnlockDiagnosticVMOptions -XX:-UseCompressedOops -XX:PrintAssemblyOptions=intel
  * -XX:GuaranteedSafepointInterval=0
  * -XX:+UseCountedLoopSafepoints
- * -XX:CompileCommand=print,benchmark.LoopUnwindingTest::sum
+ * -XX:CompileCommand=print,basic.LoopUnwindingTest::sum
  * </pre>
  * <pre>
  * 测试结果
@@ -140,7 +140,8 @@ public class LoopUnwindingTest {
 
     /**
      * 循环展开求和
-     * <p>按照一定的步数跳跃，每次循环处理多个对象，使循环次数减少，这样性能也许有一定提升。
+     * <p>按照一定的步数跳跃，每次循环处理多个对象，使循环次数减少，编译器可以充分优化循环内的计算，这样性能应该有一定提升。
+     * <p>但是这样代码更复杂了，而且容易写错
      * <p>(区别于全部展开，如果n很小比如<10，也许全部展开不用循环就可以了)
      */
     private static long sum2(int n) {
@@ -159,6 +160,7 @@ public class LoopUnwindingTest {
 //            result8 += calc0(j + 8);
 //            result9 += calc0(j + 9);
         }
+        // 如果n不被gap整除，处理剩余部分
         for (int j = m + 1; j <= n; j++) {
             result += calc0(j);
         }
