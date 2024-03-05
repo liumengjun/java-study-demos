@@ -11,6 +11,13 @@ public class BinaryTree<T> {
 
 	BinaryNode<T> root;
 
+    public BinaryTree() {
+    }
+
+    public BinaryTree(BinaryNode<T> root) {
+        this.root = root;
+    }
+
 	/**
 	 * @param data
 	 */
@@ -358,7 +365,7 @@ public class BinaryTree<T> {
 
 	/**
 	 * 以Z字形走向层次遍历二叉树
-	 * 
+	 *
 	 * @param visitor
 	 */
 	public void levelOrderInZigzag(VisitInterface<T> visitor) {
@@ -547,4 +554,79 @@ public class BinaryTree<T> {
 		preOrder(visitor);
 		return visitBuffer.toString();
 	}
+
+    public String serialize() {
+        return serialize(this.root);
+    }
+
+    /**
+     * 序列化二叉树，结果如{1,2,3,#,#,6,7}。
+     * <p>层次遍历，空节点补‘#’。
+     */
+    public static String serialize(BinaryNode root) {
+        if (root == null) return "{}";
+
+        final BinaryNode dummy = new BinaryNode(-1);
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        // 使用队列进行层序遍历，起始先将 root 放入队列
+        Deque<BinaryNode> queue = new ArrayDeque<>();
+        queue.addLast(root);
+        int validCount = 1;  // 队列内有效node数，优化效率否则结尾一堆“#,#,”
+        while (!queue.isEmpty() && validCount > 0) {
+            BinaryNode node = queue.pollFirst();
+            sb.append((node == dummy ? "#" : node.data) + ",");
+            if (node == dummy) {
+                continue;
+            } else {
+                validCount--;
+            }
+            queue.addLast(node.leftChild != null ? node.leftChild : dummy);
+            queue.addLast(node.rightChild != null ? node.rightChild : dummy);
+            if (node.leftChild != null) validCount++;
+            if (node.rightChild != null) validCount++;
+        }
+//        System.out.println(sb);
+        while (sb.substring(sb.length() - 2).equals("#,")) {
+            sb.setLength(sb.length() - 2);
+        }
+        sb.setCharAt(sb.length() - 1, '}');
+        return sb.toString();
+    }
+
+    /**
+     * 根据字符串构建二叉树，型如{1,2,3,#,#,6,7}。
+     * <p>层次遍历，空节点为‘#’。
+     */
+    public static BinaryNode<Integer> deserialize(String str) {
+        if (str == null || str.isEmpty()) {
+            return null;
+        }
+        str = str.trim();
+        if (!str.startsWith("{") || !str.endsWith("}")) {
+            return null;
+        }
+        str = str.substring(1, str.length() - 1);
+        String[] vals = str.split(",");
+        BinaryNode root = new BinaryNode(Integer.valueOf(vals[0]));
+        ArrayDeque<BinaryNode> queue = new ArrayDeque<>();
+        queue.add(root);
+        for (int i = 1; i < vals.length; i += 2) {
+            BinaryNode node = queue.poll();
+            String l = vals[i].trim();
+            if (!l.equals("#")) {
+                node.leftChild = new BinaryNode(Integer.valueOf(l), node);
+                queue.add(node.leftChild);
+            }
+            if (i + 1 >= vals.length) {
+                break;
+            }
+            String r = vals[i + 1].trim();
+            if (!r.equals("#")) {
+                node.rightChild = new BinaryNode(Integer.valueOf(r), node);
+                queue.add(node.rightChild);
+            }
+        }
+        return root;
+    }
 }

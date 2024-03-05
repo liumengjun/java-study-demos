@@ -5,10 +5,11 @@ import java.util.Random;
 public class TreeTest {
 
 	public static void main(String[] args) {
-		testTree(args);
+		// testTree(args);
 		// testBST(args);
 		// testAVL(args);
 		// testAVL2();
+        testTreeSerialize();
 	}
 
 	public static void testAVL2() {
@@ -293,4 +294,62 @@ public class TreeTest {
 			System.out.println("contains(" + i + "): " + tree.contains(i));
 		}
 	}
+
+    public static void testTreeSerialize() {
+        String str = "{5,4,#,3,#,2}";
+        System.out.println("from: " + str);
+        BinaryTree<Integer> tree = new BinaryTree<>(BinaryTree.deserialize(str));
+        tree.show();
+        String ss = tree.serialize();
+        System.out.println("final: " + ss + ". ok: " + str.equals(ss));
+        System.out.println();
+
+        str = "{1,2,3,4,5}";
+        System.out.println("from: " + str);
+        tree.root = BinaryTree.deserialize(str);
+        tree.show();
+        ss = tree.serialize();
+        System.out.println("final: " + ss + ". ok: " + str.equals(ss));
+        System.out.println();
+
+        str = "{1,2,3,#,#,6,7}";
+        System.out.println("from: " + str);
+        tree.root = BinaryTree.deserialize(str);
+        tree.show();
+        ss = tree.serialize();
+        System.out.println("final: " + ss + ". ok: " + str.equals(ss));
+        System.out.println();
+
+        str = "{8,6,10,5,7,9,11}";
+        System.out.println("from: " + str);
+        tree.root = BinaryTree.deserialize(str);
+        tree.show();
+        ss = tree.serialize();
+        System.out.println("final: " + ss + ". ok: " + str.equals(ss));
+        System.out.println();
+
+        str = "{10,6,14,4,8,12,16}";
+        System.out.println("from: " + str);
+        tree.root = BinaryTree.deserialize(str);
+        tree.show();
+        ss = tree.serialize();
+        System.out.println("final: " + ss + ". ok: " + str.equals(ss));
+        System.out.println();
+
+        str = "{7,1,12,0,4,11,14,#,#,3,5}";
+        System.out.println("from: " + str);
+        tree.root = BinaryTree.deserialize(str);
+        tree.show();
+        ss = tree.serialize();
+        System.out.println("final: " + ss + ". ok: " + str.equals(ss));
+        System.out.println();
+
+        str = "{1,2,3,4,#,5,6,#,7,#,#,8}";
+        System.out.println("from: " + str);
+        tree.root = BinaryTree.deserialize(str);
+        tree.show();
+        ss = tree.serialize();
+        System.out.println("final: " + ss + ". ok: " + str.equals(ss));
+        System.out.println();
+    }
 }
