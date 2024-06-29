@@ -1,0 +1,5 @@
+JDK8 + Java3Dv1.6.2 + JOGLv2.5.0
+https://jogamp.org/
+https://jogamp.org/wiki/index.php?title=Downloading_and_installing_Java3D
+https://jogamp.org/wiki/index.php?title=Downloading_and_installing_JOGL
+Java3D的jar文件和joamp相应平台的jar文件一起放入JDK安装路径下jre/lib/ext目录里
