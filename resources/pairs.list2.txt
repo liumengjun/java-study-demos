@@ -1,0 +1,10 @@
+Q,Z
+A,J
+V,Q
+O,K
+H,C
+E,C
+J,A
+C,Q
+K,R
+L,M

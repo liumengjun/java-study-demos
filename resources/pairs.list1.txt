@@ -1,0 +1,10 @@
+N,C
+L,P
+U,O
+Q,B
+A,K
+N,L
+B,T
+P,T
+I,M
+A,G
