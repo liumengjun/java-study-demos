@@ -4,11 +4,24 @@ import util.UnionFind;
 import static java.lang.IO.println;
 
 
+/// 构造 name 的字符集大小, 可调范围\[2, 62], 其他会自动修正, 即\[大写字母+小写字母+数字]
+final int NAME_CHARSET_LENGTH = 20;
+/// 单个 name 长度, 即字符个数
+final int NAME_LEN = 4;
+final int PAIRS_COUNT = 80000;
+final String PAIRS_FILE_PATH = "temp/pairs.list.txt";
+private final Random random = new Random(System.currentTimeMillis());
+private char[] nameChars;
+
+/// -1, 0, 1, 2, 3, 4; 数越大输出信息越多, 小于0只输出硬编码的输出信息。
+int msgLevel = 0;
+
+
 /**
  * 生成一些名字 pair, 然后合并有相同名字的 pair 为一组。
  *
  * <p>
- * 调整 NAME_LEN 和 PAIRS_COUNT, 重新调用 genPairs(), 观察结果。
+ * 调整 NAME_CHARSET_LENGTH, NAME_LEN 和 PAIRS_COUNT, 重新调用 genPairs(), 观察结果。
  * 小数据集验证, 大数据集探索调优。
  * <p>
  * <p>
@@ -18,14 +31,6 @@ import static java.lang.IO.println;
  * <p>
  * {@link #unitePairsToGroupsByUnionFind(List)} 性能更佳
  */
-final int NAME_LEN = 3;
-final int PAIRS_COUNT = 60000;
-final String PAIRS_FILE_PATH = "temp/pairs.list.txt";
-final Random random = new Random(System.currentTimeMillis());
-
-int msgLevel = 0; // -1, 0, 1, 2, 3, 4; 数越大输出信息越多, 小于0只输出硬编码的输出信息。
-
-
 void main() {
     genPairs(true);
 
@@ -90,24 +95,14 @@ int unitePairsToGroups(List<Group> groups) {
                 println("Found joint groups: %s and %s".formatted(iGroup, fGroup));
             }
             // 标记归属, 向前看齐, 设置 Group.num 为前面的 Group 的更小的 Group.num
-            if (iGroup.num > fGroup.num) {
-//                iGroup.num = fGroup.num;
+            // 若 iGroup.num 更小, 则是已经判断得知 iGroup 和更靠前的 Group 有交集。
+            if (iGroup.num != fGroup.num) {
+                int srcNum = Math.max(iGroup.num, fGroup.num);
+                int destNum = Math.min(iGroup.num, fGroup.num);
                 for (int a = 0; a <= i; a++) {
                     Group aGroup = groups.get(a);
-                    if (aGroup.num == iGroup.num) {
-                        aGroup.num = fGroup.num;
-                    }
-                }
-            } else if (iGroup.num == fGroup.num) {
-                // 不需要处理
-            } else {
-                // iGroup.num 更小, 已经判断得知 iGroup 和更靠前的 Group 有交集,
-                // 回溯标记所有 fGroup.num 的 Group, 更改其 num 为 iGroup.num。
-                int fNum = fGroup.num;
-                for (int a = 0; a <= i; a++) {
-                    Group aGroup = groups.get(a);
-                    if (aGroup.num == fNum) {
-                        aGroup.num = iGroup.num;
+                    if (aGroup.num == srcNum) {
+                        aGroup.num = destNum;
                     }
                 }
             }
@@ -348,7 +343,7 @@ void genPairs(boolean allowSame) {
     if (pairsFile.exists()) {
         return;
     }
-    initCharset();
+    initCharset(NAME_CHARSET_LENGTH);
     var counter = new Counter();
     try (PrintWriter writer = new PrintWriter(Files.newOutputStream(pairsPath))) {
         for (int i = 0; i < PAIRS_COUNT; i++) {
@@ -372,16 +367,16 @@ void genPairs(boolean allowSame) {
     println("*".repeat(80));
 }
 
-private final char[] nameChars = new char[62];
-
-private void initCharset() {
-    for (int i = 0; i < 26; i++) {
+private void initCharset(int len) {
+    len = Math.min(Math.max(2, len), 62);
+    nameChars = new char[len];
+    for (int i = 0; i < 26 && i < len; i++) {
         nameChars[i] = (char) ('A' + i);
     }
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < 26 && i + 26 < len; i++) {
         nameChars[i + 26] = (char) ('a' + i);
     }
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10 && i + 52 < len; i++) {
         nameChars[i + 52] = (char) ('0' + i);
     }
     println("pair names charset: " + new String(nameChars));
@@ -389,7 +384,7 @@ private void initCharset() {
 
 private String genRandomName() {
     char[] chars = new char[NAME_LEN];
-    chars[0] = (char) ('A' + random.nextInt(26));
+    chars[0] = (char) ('A' + random.nextInt(Math.min(nameChars.length, 26))); // 大写字母开头
     for (int i = 1; i < chars.length; i++) {
         chars[i] = nameChars[random.nextInt(nameChars.length)];
     }
