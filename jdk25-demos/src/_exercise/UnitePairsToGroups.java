@@ -5,16 +5,16 @@ import static java.lang.IO.println;
 
 
 /// 构造 name 的字符集大小, 可调范围\[2, 62], 其他会自动修正, 即\[大写字母+小写字母+数字]
-final int NAME_CHARSET_LENGTH = 20;
+final int NAME_CHARSET_LENGTH = 40;
 /// 单个 name 长度, 即字符个数
-final int NAME_LEN = 4;
-final int PAIRS_COUNT = 80000;
+final int NAME_LEN = 3;
+final int PAIRS_COUNT = 40000;
 final String PAIRS_FILE_PATH = "temp/pairs.list.txt";
 private final Random random = new Random(System.currentTimeMillis());
 private char[] nameChars;
 
-/// -1, 0, 1, 2, 3, 4; 数越大输出信息越多, 小于0只输出硬编码的输出信息。
-int msgLevel = 0;
+/// -1, 0, 1, 2, 3, 4, 5; 数越大输出信息越多, 小于0只输出硬编码的输出信息。
+int msgLevel = 1;
 
 
 /**
@@ -25,19 +25,25 @@ int msgLevel = 0;
  * 小数据集验证, 大数据集探索调优。
  * <p>
  * <p>
- * 两种实现方法:
+ * 三种实现方法:
  * <p>
  * {@link #unitePairsToGroups(List)}
  * <p>
- * {@link #unitePairsToGroupsByUnionFind(List)} 性能更佳
+ * {@link #unitePairsToGroupsByUnionFind(List)}
+ * <p>
+ * {@link #unitePairsToGroupsMultiThread(List)}
  */
 void main() {
     genPairs(true);
 
     // read
+//    final List<Group> groups = readPairs("resources/pairs.list1.txt", "resources/pairs.list2.txt");
+//    final List<Group> groups = readPairs("resources/pairs.list3.txt");
     final List<Group> groups = readPairs();
     println("read pairs count: " + groups.size());
     printGroups(3, groups, "~", "Read pairs detail");
+
+    println("*".repeat(40) + "方法1 - UnionFind" + "*".repeat(40)); // 分割线
 
     // 方法1
     long startTime1 = System.currentTimeMillis();
@@ -45,13 +51,13 @@ void main() {
     long elapsedTime1 = System.currentTimeMillis() - startTime1;
     println("Processing groups elapsed time: %dms".formatted(elapsedTime1));
     printGroupsNumCounterStat(groups);
-    println("Final merged group count: %d".formatted(cnt1));
+    println("Final remain group count: %d".formatted(cnt1));
     Set<Set<Integer>> numSetSet1 = buildGroupsNumSetSet(groups);
+    Set<Set<String>> nameSetSet1 = buildGroupsNameSetSet(groups);
 
-    println("*".repeat(80)); // 分割线, 下面换一种方法
-
+    println("*".repeat(40) + "方法2 - Common" + "*".repeat(40)); // 分割线, 下面换一种方法
     groups.forEach(Group::reset); // reset
-    printGroups(4, groups, "~", "After reset");
+    printGroups(5, groups, "~", "After reset");
 
     // 方法2
     long startTime2 = System.currentTimeMillis();
@@ -59,11 +65,32 @@ void main() {
     long elapsedTime2 = System.currentTimeMillis() - startTime2;
     println("Processing groups elapsed time: %dms".formatted(elapsedTime2));
     printGroupsNumCounterStat(groups);
-    println("Final merged group count: %d".formatted(cnt2));
+    println("Final remain group count: %d".formatted(cnt2));
     println("两个方法最终集合数量结果%s".formatted(cnt1 == cnt2 ? "相同" : "不同"));
     Set<Set<Integer>> numSetSet2 = buildGroupsNumSetSet(groups);
     boolean sameNumSets = Objects.equals(numSetSet1, numSetSet2);
     println("两个方法NumSets结果%s".formatted(sameNumSets ? "相同" : "不同"));
+    Set<Set<String>> nameSetSet2 = buildGroupsNameSetSet(groups);
+    boolean sameNameSets = Objects.equals(nameSetSet1, nameSetSet2);
+    println("两个方法NameSets结果%s".formatted(sameNameSets ? "相同" : "不同"));
+
+    println("*".repeat(40) + "方法3 - Multi-Thread" + "*".repeat(40)); // 分割线, 下面换一种方法
+    groups.forEach(Group::reset); // reset
+
+    // 方法3
+    long startTime3 = System.currentTimeMillis();
+    int cnt3 = unitePairsToGroupsMultiThread(groups);
+    long elapsedTime3 = System.currentTimeMillis() - startTime3;
+    println("Processing groups elapsed time: %dms".formatted(elapsedTime3));
+    printGroupsNumCounterStat(groups);
+    println("Final remain group count: %d".formatted(cnt3));
+    println("方法3:最终集合数量结果%s".formatted(cnt1 == cnt3 ? "相同" : "不同"));
+    Set<Set<Integer>> numSetSet3 = buildGroupsNumSetSet(groups);
+    boolean sameNumSets3 = Objects.equals(numSetSet1, numSetSet3);
+    println("方法3:NumSets结果%s(子线程内会合并掉一些Num)".formatted(sameNumSets3 ? "相同" : "不同"));
+    Set<Set<String>> nameSetSet3 = buildGroupsNameSetSet(groups);
+    boolean sameNameSets3 = Objects.equals(nameSetSet1, nameSetSet3);
+    println("方法3:NameSets结果%s".formatted(sameNameSets3 ? "相同" : "不同"));
 }
 
 
@@ -76,6 +103,9 @@ void main() {
  * => (A,B,C) (D,E)
  * <p>
  * 通过遍历标记分组实现; 另一种通过{@link UnionFind}实现的版本见{@link #unitePairsToGroupsByUnionFind}。
+ *
+ * @see #unitePairsToGroupsByUnionFind
+ * @see #unitePairsToGroupsMultiThread
  */
 int unitePairsToGroups(List<Group> groups) {
     // 联结有交集的 pair, 转化为同一组。
@@ -87,7 +117,7 @@ int unitePairsToGroups(List<Group> groups) {
         for (int f = 0; f < i; f++) {
             // f 在 i 的前面, 判断 i 和 f 是否有交集, 没则继续下一个, 有则标记归属
             Group fGroup = groups.get(f);
-            if (!iGroup.hasJointWith(fGroup)) {
+            if (iGroup.num == fGroup.num || !iGroup.hasJointWith(fGroup)) {
                 continue;
             }
             foundJoint = true;
@@ -133,14 +163,13 @@ int collectResultGroups(List<Group> groups) {
         if (iGroup.merged) {
             continue;
         }
-        iGroup.init();
+        iGroup.doCollect();
         // u 在 i 的后面, 向前看齐合并
         for (int u = i + 1; u < groups.size(); u++) {
             Group uGroup = groups.get(u);
             if (uGroup.num == iGroup.num) {
                 iGroup.add(uGroup);
-                uGroup.merged = true;
-//                uGroup.member.clear();
+                uGroup.markMerged();
             }
         }
         groupCount++;
@@ -150,8 +179,12 @@ int collectResultGroups(List<Group> groups) {
 
 /**
  * 合并有交集的 pair, 转化为同一组。
+ *
  * <p>
  * 用{@link UnionFind}实现; 普通遍历版本见{@link #unitePairsToGroups}。
+ *
+ * @see #unitePairsToGroups
+ * @see #unitePairsToGroupsMultiThread
  */
 int unitePairsToGroupsByUnionFind(List<Group> groups) {
     // 用 UnionFind 联结有交集的 pair
@@ -163,6 +196,9 @@ int unitePairsToGroupsByUnionFind(List<Group> groups) {
         for (int f = 0; f < i; f++) {
             // f 在 i 的前面, 判断 i 和 f 是否有交集, 没则继续下一个, 有则union
             Group fGroup = groups.get(f);
+//            if (iGroup.num == fGroup.num) {
+//                continue;
+//            }
             if (iGroup.hasJointWith(fGroup)) {
                 foundJoint = true;
                 if (msgLevel >= 3) {
@@ -200,18 +236,117 @@ int collectResultGroupsV2(List<Group> groups) {
     int groupCount = 0;
     for (int i = 0; i < groups.size(); i++) {
         Group iGroup = groups.get(i);
+        if (iGroup.merged) {
+            continue;
+        }
         if (iGroup.num == i) {
-            iGroup.init();
+            iGroup.doCollect();
             groupCount++;
         } else {
             Group nGroup = groups.get(iGroup.num);
-            nGroup.init();
+            nGroup.doCollect();
             nGroup.add(iGroup);
+            iGroup.markMerged();
         }
     }
     return groupCount;
 }
 
+/**
+ * 合并有交集的 pair, 转化为同一组。
+ *
+ * <p>
+ * 还是通过遍历标记分组实现, 使用多线程。(探索多节点执行逻辑。)
+ *
+ * @see #unitePairsToGroups
+ * @see #unitePairsToGroupsByUnionFind
+ */
+int unitePairsToGroupsMultiThread(List<Group> groups) {
+    // groups 分区
+    int partCount = Runtime.getRuntime().availableProcessors();
+    int partSize = (groups.size() + partCount - 1) / partCount;
+    List<List<Group>> parts = new ArrayList<>();
+    for (int i = 0; i < groups.size(); i += partSize) {
+        parts.add(groups.subList(i, Math.min(i + partSize, groups.size())));
+    }
+    if (msgLevel >= 1) {
+        println("subtasks count: %d, each task has %d elements。".formatted(parts.size(), partSize));
+    }
+    // 先分批子线程处理, 子线程内会合并一些Group, 保留下来的再在后面汇总
+    try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+        for (int i = 0; i < parts.size(); i++) {
+            final int j = i;
+            executor.submit(() -> {
+                unitePairsToGroups(parts.get(j));
+            });
+        }
+    }
+    if (msgLevel >= 1) {
+        long cnt = groups.stream().filter(g -> g.merged).count();
+        println("In subtasks(Sub-Thread), has been merged group count: %d, rate: %.2f%%".formatted(
+                cnt, 100.0 * cnt / groups.size()));
+    }
+    // 汇总, 整体思路一样, 跳过已经被合并的, 判断共同元素通过集合而不是pair。
+    Set<Integer> jointNums = new HashSet<>();
+    for (int i = 1; i < groups.size(); i++) {
+        Group iGroup = groups.get(i);
+        if (iGroup.merged) {
+            continue;
+        }
+        // 首先, 挑选所有与当前 Group 有交集的 Group, 标记为相同的编号
+        jointNums.clear();
+        jointNums.add(iGroup.num);
+        int minNum = iGroup.num;
+        for (int f = 0; f < i; f++) {
+            Group fGroup = groups.get(f);
+            if (fGroup.merged || jointNums.contains(fGroup.num)) {
+                continue;
+            }
+            if (fGroup.anyJointWith(iGroup)) {
+                jointNums.add(fGroup.num);
+                minNum = Math.min(minNum, fGroup.num);
+                if (msgLevel >= 3) {
+                    println("Main thread Found joint groups: %s and %s".formatted(iGroup, fGroup));
+                }
+            }
+        }
+        // 标记归属, 向前看齐, 设置 Group.num 为最小的 Group.num
+        if (minNum != iGroup.num) {
+            for (int a = 0; a <= i; a++) {
+                Group aGroup = groups.get(a);
+                if (jointNums.contains(aGroup.num)) {
+                    aGroup.num = minNum;
+                }
+            }
+            printGroups(4, groups, "-", "Main thread After processing [" + i + "] Group");
+        }
+    }
+    if (msgLevel < 4) { // 内部 print 了这里就不显示了
+        printGroups(3, groups, "=", "Main thread processed each all");
+    }
+
+    // collect result, 上面只是标记，下面这里收集到 Group 集合中
+    int groupCount = collectResultGroupsV2(groups);
+    printGroups(2, groups, "=", "Main thread Merged marked groups");
+    return groupCount;
+}
+
+
+Set<Set<String>> buildGroupsNameSetSet(List<Group> groups) {
+    Set<Set<String>> nameSetSet = new HashSet<>();
+    for (int i = 0; i < groups.size(); i++) {
+        Group g = groups.get(i);
+        if (g.merged) {
+            continue;
+        }
+        nameSetSet.add(g.members);
+    }
+    if (msgLevel >= 2) {
+        println("{NameSets}: " + nameSetSet);
+        println("-".repeat(80));
+    }
+    return nameSetSet;
+}
 
 Set<Set<Integer>> buildGroupsNumSetSet(List<Group> groups) {
     Map<Integer, Set<Integer>> numToSet = new HashMap<>();
@@ -226,7 +361,7 @@ Set<Set<Integer>> buildGroupsNumSetSet(List<Group> groups) {
         set.add(i);
     }
     Set<Set<Integer>> numSetSet = new HashSet<>(numToSet.values());
-    if (msgLevel >= 1) {
+    if (msgLevel >= 2) {
         println("{Num -> Set}: " + numToSet);
         println("{NumSets}: " + numSetSet);
         println("-".repeat(80));
@@ -243,19 +378,24 @@ void printGroupsNumCounterStat(List<Group> groups) {
 
     int total = counter.total();
     println("Sets count: %d, pairs total: %d, avg: %.2f".formatted(counter.size(), total, 1.0 * total / counter.size()));
-    if (msgLevel >= 1) {
+    if (msgLevel >= 2) {
         println("Each Set count stat: " + counter);
     }
     println("Most largest sets: " + counter.mostCommon(10));
     println("-".repeat(80));
 }
 
-private void printGroups(int grade, List groups, String ch, String note) {
+private void printGroups(int grade, List<Group> groups, String ch, String note) {
     if (msgLevel < grade) {
         return;
     }
     printBlockHead(note, ch);
-    groups.forEach(IO::println);
+    groups.forEach(g -> {
+        if (g.merged) {
+            return;
+        }
+        println(g);
+    });
     printBlockEnd(note, ch);
 }
 
@@ -284,6 +424,9 @@ private void printGroupsWithUf(int grade, List<Group> groups, UnionFind uf, Stri
     printBlockHead(note, ch);
     for (int i = 0; i < groups.size(); i++) {
         Group g = groups.get(i);
+        if (g.merged) {
+            continue;
+        }
         println(formatGroupWithUf(g, uf));
     }
     printBlockEnd(note, ch);
@@ -301,20 +444,21 @@ private String formatGroupWithUf(Group g, UnionFind uf) {
  * @param pairsFilePaths null/0 then default {@link #PAIRS_FILE_PATH}
  */
 List<Group> readPairs(String... pairsFilePaths) {
+    var counter = new Counter();
     if (pairsFilePaths == null || pairsFilePaths.length == 0) {
-        return readPairsOne(PAIRS_FILE_PATH);
+        return readPairsOne(PAIRS_FILE_PATH, counter, false, 0);
     }
     List<Group> pairs = new ArrayList<>();
     for (String pairsFilePath : pairsFilePaths) {
-        pairs.addAll(readPairsOne(pairsFilePath));
+        pairs.addAll(readPairsOne(pairsFilePath, counter, true, pairs.size()));
     }
+    printPairsNameCounterStat(counter);
     return pairs;
 }
 
-private List<Group> readPairsOne(String pairsFilePath) {
+private List<Group> readPairsOne(String pairsFilePath, Counter counter, boolean inner, int num) {
     List<Group> pairs = new ArrayList<>();
     try (Scanner scanner = new Scanner(new File(pairsFilePath))) {
-        int num = 0;
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
             String[] pair = line.split(",");
@@ -323,10 +467,15 @@ private List<Group> readPairsOne(String pairsFilePath) {
             }
             Group group = new Group(num, pair[0], pair[1]);
             pairs.add(group);
+            counter.add(pair[0]);
+            counter.add(pair[1]);
             num++;
         }
     } catch (FileNotFoundException e) {
         e.printStackTrace();
+    }
+    if (!inner) {
+        printPairsNameCounterStat(counter);
     }
     return pairs;
 }
@@ -362,9 +511,13 @@ void genPairs(boolean allowSame) {
         e.printStackTrace();
     }
     println("with name length: %d, pairsCount: %d。".formatted(NAME_LEN, PAIRS_COUNT));
+    printPairsNameCounterStat(counter);
+}
+
+private void printPairsNameCounterStat(Counter counter) {
     println("final: name total: %d, unique count: %d。".formatted(counter.total(), counter.size()));
     println("most common:" + counter.mostCommon(10));
-    println("*".repeat(80));
+    println("=".repeat(80));
 }
 
 private void initCharset(int len) {
@@ -392,48 +545,66 @@ private String genRandomName() {
 }
 
 
-class Group {
+static class Group {
     int num; // 编号
     final int origNum; // 初始编号
     final String pairA, pairB; // 原始 pair 数据
-    Set<String> member;
+    Set<String> members;
     boolean collected;
+    /// 被合并(吞并)了
     boolean merged;
 
     Group(int num, String pairA, String pairB) {
-        this.num = this.origNum = num;
+        this.origNum = num;
         this.pairA = pairA;
         this.pairB = pairB;
+        this.reset();
     }
 
     void reset() {
         this.num = this.origNum;
-        member = null;
+        members = new HashSet<>(); // 新建而不是清空
+        members.add(pairA);
+        members.add(pairB);
         collected = merged = false;
     }
 
-    boolean init() {
-        if (collected) {
-            return false;
-        }
-        if (member == null)
-            member = new HashSet<>();
-        member.add(pairA);
-        member.add(pairB);
-        return collected = true;
+    void doCollect() {
+        collected = true;
+    }
+
+    /// 标记为被合并(吞并)了
+    void markMerged() {
+        merged = true;
+        members = null;
     }
 
     void add(Group that) {
-        this.member.add(that.pairA);
-        this.member.add(that.pairB);
+        this.members.addAll(that.members);
     }
 
+    /// 通过 pair 判断, 通过集合(Set)判断见[#anyJointWith]
     boolean hasJointWith(Group that) {
         return this.pairA.equals(that.pairA) || this.pairA.equals(that.pairB)
                 || this.pairB.equals(that.pairA) || this.pairB.equals(that.pairB);
     }
 
+    /// 通过集合(Set)判断, 若只有两个元素, 性能不如 [#hasJointWith]
+    boolean anyJointWith(Group that) {
+        Set<String> small = this.members, big = that.members;
+        if (small.size() > big.size()) {
+            small = big;
+            big = this.members;
+        }
+        for (String name : small) {
+            if (big.contains(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String toString() {
-        return "[%d][%d](%s, %s)%s".formatted(origNum, num, pairA, pairB, collected ? member : "");
+        return "[%d][%d](%s, %s)%s".formatted(origNum, num, pairA, pairB, collected ? members : "");
     }
 }
