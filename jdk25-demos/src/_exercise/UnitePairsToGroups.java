@@ -1,8 +1,22 @@
+// Compact Code Class 没有包, 但是其他类也引用不到？(用反射)🤔😱。若要其他类正常引用需要显示声明 class 和 package
+//package _exercise;
+
 import util.Counter;
 import util.UnionFind;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.Executors;
+
 import static java.lang.IO.println;
 
+//class UnitePairsToGroups {
 
 /// 构造 name 的字符集大小, 可调范围\[2, 62], 其他会自动修正, 即\[大写字母+小写字母+数字]
 final int NAME_CHARSET_LENGTH = 40;
@@ -31,10 +45,12 @@ int msgLevel = 1;
  * <p>
  * {@link #unitePairsToGroupsByUnionFind(List)}
  * <p>
- * {@link #unitePairsToGroupsMultiThread(List)}
+ * {@link #unitePairsToGroupsMultiThread}
+ * <p>
+ * 性能结果见 {@link _exercise.UnitePairsToGroupsBenchmark}
  */
 void main() {
-    genPairs(true);
+    genPairs(true, false, NAME_CHARSET_LENGTH, NAME_LEN, PAIRS_COUNT, null);
 
     // read
 //    final List<Group> groups = readPairs("resources/pairs.list1.txt", "resources/pairs.list2.txt");
@@ -79,7 +95,7 @@ void main() {
 
     // 方法3
     long startTime3 = System.currentTimeMillis();
-    int cnt3 = unitePairsToGroupsMultiThread(groups);
+    int cnt3 = unitePairsToGroupsMultiThread(groups, true);
     long elapsedTime3 = System.currentTimeMillis() - startTime3;
     println("Processing groups elapsed time: %dms".formatted(elapsedTime3));
     printGroupsNumCounterStat(groups);
@@ -196,14 +212,14 @@ int unitePairsToGroupsByUnionFind(List<Group> groups) {
         for (int f = 0; f < i; f++) {
             // f 在 i 的前面, 判断 i 和 f 是否有交集, 没则继续下一个, 有则union
             Group fGroup = groups.get(f);
-//            if (iGroup.num == fGroup.num) {
-//                continue;
-//            }
+            if (uf.get(i) == uf.get(f)) {
+                continue;
+            }
             if (iGroup.hasJointWith(fGroup)) {
                 foundJoint = true;
                 if (msgLevel >= 3) {
                     println("Found joint groups: %s and %s".formatted(
-                            formatGroupWithUf(iGroup, uf), formatGroupWithUf(fGroup, uf)));
+                            formatGroupWithUf(iGroup, uf.get(i)), formatGroupWithUf(fGroup, uf.get(f))));
                 }
                 // 使用 UnionFind 合并
                 uf.union(f, i); // trick: 小的参数在前
@@ -257,11 +273,12 @@ int collectResultGroupsV2(List<Group> groups) {
  *
  * <p>
  * 还是通过遍历标记分组实现, 使用多线程。(探索多节点执行逻辑。)
+ * 子线程任务使用 UnionFind。
  *
  * @see #unitePairsToGroups
  * @see #unitePairsToGroupsByUnionFind
  */
-int unitePairsToGroupsMultiThread(List<Group> groups) {
+int unitePairsToGroupsMultiThread(List<Group> groups, boolean subtaskByUF) {
     // groups 分区
     int partCount = Runtime.getRuntime().availableProcessors();
     int partSize = (groups.size() + partCount - 1) / partCount;
@@ -277,7 +294,11 @@ int unitePairsToGroupsMultiThread(List<Group> groups) {
         for (int i = 0; i < parts.size(); i++) {
             final int j = i;
             executor.submit(() -> {
-                unitePairsToGroups(parts.get(j));
+                if (subtaskByUF) {
+                    unitePairsToGroupsByUnionFind(parts.get(j));
+                } else {
+                    unitePairsToGroups(parts.get(j));
+                }
             });
         }
     }
@@ -286,9 +307,15 @@ int unitePairsToGroupsMultiThread(List<Group> groups) {
         println("In subtasks(Sub-Thread), has been merged group count: %d, rate: %.2f%%".formatted(
                 cnt, 100.0 * cnt / groups.size()));
     }
+    if (subtaskByUF) {
+        groups.forEach(g -> {
+            // 子线程使用 UnionFind 方法, 需要修正子线程内的 Group.num 为全局的编号
+            g.num = g.origNum / partSize * partSize + g.num;
+        });
+    }
     // 汇总, 整体思路一样, 跳过已经被合并的, 判断共同元素通过集合而不是pair。
-    Set<Integer> jointNums = new HashSet<>();
-    for (int i = 1; i < groups.size(); i++) {
+    Set<Integer> jointNums = new HashSet<>(groups.size());
+    for (int i = partSize; i < groups.size(); i++) {
         Group iGroup = groups.get(i);
         if (iGroup.merged) {
             continue;
@@ -427,14 +454,13 @@ private void printGroupsWithUf(int grade, List<Group> groups, UnionFind uf, Stri
         if (g.merged) {
             continue;
         }
-        println(formatGroupWithUf(g, uf));
+        println(formatGroupWithUf(g, uf.get(i)));
     }
     printBlockEnd(note, ch);
 }
 
-private String formatGroupWithUf(Group g, UnionFind uf) {
-    int i = g.origNum;
-    return "[%d][%d](%s, %s)".formatted(i, uf.get(i), g.pairA, g.pairB);
+private String formatGroupWithUf(Group g, int ufNum) {
+    return "[%d][%d](%s, %s)".formatted(g.origNum, ufNum, g.pairA, g.pairB);
 }
 
 
@@ -486,19 +512,24 @@ private List<Group> readPairsOne(String pairsFilePath, Counter counter, boolean 
  * <p>
  * 不会覆盖旧文件, 已存在则什么也不做, 删除旧文件才会重新生成。
  */
-void genPairs(boolean allowSame) {
-    Path pairsPath = Paths.get(PAIRS_FILE_PATH);
+void genPairs(boolean allowSame, boolean overwrite,
+              int charsetLen, int nameLen, int pairsCount, String filepath) {
+    filepath = (filepath == null || filepath.isBlank()) ? PAIRS_FILE_PATH : filepath;
+    Path pairsPath = Paths.get(filepath);
     File pairsFile = pairsPath.toFile();
     if (pairsFile.exists()) {
-        return;
+        if (!overwrite) {
+            return;
+        }
+        println("将要覆盖文件: %s, 重新生成 pairs 数据。".formatted(filepath));
     }
-    initCharset(NAME_CHARSET_LENGTH);
+    initCharset(charsetLen);
     var counter = new Counter();
     try (PrintWriter writer = new PrintWriter(Files.newOutputStream(pairsPath))) {
-        for (int i = 0; i < PAIRS_COUNT; i++) {
-            String a = genRandomName(), b = genRandomName();
+        for (int i = 0; i < pairsCount; i++) {
+            String a = genRandomName(nameLen), b = genRandomName(nameLen);
             while (b.equals(a) && !allowSame) {
-                b = genRandomName();
+                b = genRandomName(nameLen);
             }
             writer.print(a);
             writer.print(',');
@@ -506,11 +537,11 @@ void genPairs(boolean allowSame) {
             counter.add(a);
             counter.add(b);
         }
-        println("Generate pairs successfully @: " + PAIRS_FILE_PATH);
+        println("Generate pairs successfully @: " + filepath);
     } catch (IOException e) {
         e.printStackTrace();
     }
-    println("with name length: %d, pairsCount: %d。".formatted(NAME_LEN, PAIRS_COUNT));
+    println("with name length: %d, pairsCount: %d。".formatted(nameLen, pairsCount));
     printPairsNameCounterStat(counter);
 }
 
@@ -535,8 +566,8 @@ private void initCharset(int len) {
     println("pair names charset: " + new String(nameChars));
 }
 
-private String genRandomName() {
-    char[] chars = new char[NAME_LEN];
+private String genRandomName(int nameLen) {
+    char[] chars = new char[nameLen];
     chars[0] = (char) ('A' + random.nextInt(Math.min(nameChars.length, 26))); // 大写字母开头
     for (int i = 1; i < chars.length; i++) {
         chars[i] = nameChars[random.nextInt(nameChars.length)];
@@ -608,3 +639,5 @@ static class Group {
         return "[%d][%d](%s, %s)%s".formatted(origNum, num, pairA, pairB, collected ? members : "");
     }
 }
+
+//}
